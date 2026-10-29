@@ -1,5 +1,5 @@
 ---
-title: GitHub 高频应急哨兵（Issue / PR / Actions 异常）
+title: GitHub Issue 与构建报错盯盘
 trigger:
   schedule: "*/5 * * * *"
   guard: guards/github-sentinel.mjs

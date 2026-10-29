@@ -1,5 +1,5 @@
 ---
-title: L3 渲染层实机验收（浏览器 / CDP 驱动）
+title: 软件界面交互实测
 period: day
 followUp:
   maxPerDay: 3

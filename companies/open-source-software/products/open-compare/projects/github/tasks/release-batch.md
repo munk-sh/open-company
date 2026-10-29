@@ -1,5 +1,5 @@
 ---
-title: 每日 07:00 批次发版（有当日迭代才发，推 tag 前等人放行）
+title: 每日 07:00 定时发版
 trigger:
   schedule: 0 7 * * *
 period: day

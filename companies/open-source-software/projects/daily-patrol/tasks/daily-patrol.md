@@ -1,5 +1,5 @@
 ---
-title: 每日经营与经验巡检
+title: 晚间进度盘点与经验总结
 trigger:
   schedule: 0 21 * * *
 period: day

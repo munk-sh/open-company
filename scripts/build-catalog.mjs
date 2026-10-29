@@ -15,16 +15,28 @@ const DEFAULT_REF = "main";
 const BILINGUAL_METADATA = {
   "open-source-software": {
     name: {
-      zh: "开源软件公司",
-      en: "Open Source Software Company",
+      zh: "开源软件团队",
+      en: "Open-Source Software Team",
     },
     description: {
-      zh: "孵化、研发、验收并持续运营高品质开源桌面与开发者工具的 AI 软件公司模板（内含 OpenCompare 标杆案例）。",
-      en: "An AI software company template for incubating, building, verifying, and operating production-grade open-source desktop & developer tools (featuring OpenCompare).",
+      zh: "一支替你持续维护开源软件的 AI 团队：有人盯 GitHub Issue 和构建报错、有人写代码、有人在真实桌面上做打包与界面测试、有人每天定时发版。内含实战项目 OpenCompare。",
+      en: "An AI team that maintains open-source software end to end: watching GitHub issues & CI, writing code, testing real desktop builds, and cutting daily releases. Includes OpenCompare as a live project.",
     },
     opsHighlights: {
-      zh: ["每日 21:00 全公司推进对账与跨产品经验提炼", "原生桌面操作通道（computer）"],
-      en: ["Daily 21:00 cross-product progress & experience patrol", "Native desktop operator channel (computer)"],
+      zh: [
+        "daily-patrol：每晚 21:00 盘点全团队进度，把踩坑经验写回共享规则",
+        "computer：需要使用真实电脑桌面点击操作时的公共执行通道",
+      ],
+      en: [
+        "daily-patrol: 21:00 nightly progress review & shared lessons update",
+        "computer: Shared operator channel for real desktop GUI actions",
+      ],
+    },
+    productSummaries: {
+      "open-compare": {
+        zh: "配备 7 项日常值班任务：GitHub Issue 与构建报错盯盘、每日 07:00 定时发版、安装包启动自检、大文件夹性能测试、软件界面交互实测、桌面系统窗口实测、发版后自动回帖关单。",
+        en: "Equipped with 7 standing shifts: GitHub issue & CI watch, 07:00 daily release, installer smoke check, large-folder stress test, UI interaction check, native window check, and post-release issue replies.",
+      },
     },
   },
 };
@@ -130,12 +142,14 @@ function scanCompany(slug) {
       const tasks = listMarkdownTasks(join(pProjectsDir, proj, "tasks"));
       allTasks.push(...tasks);
     }
+    const productId = parsedProduct.id || productSlug;
     return {
-      id: parsedProduct.id || productSlug,
+      id: productId,
       title: parsedProduct.title || productSlug,
       lifecycle: parsedProduct.lifecycle,
       git: parsedProduct.git,
       branch: parsedProduct.branch,
+      summary: BILINGUAL_METADATA[slug]?.productSummaries?.[productId] ?? null,
       projectsCount: pProjects.length,
       tasksCount: allTasks.length,
       tasks: allTasks,

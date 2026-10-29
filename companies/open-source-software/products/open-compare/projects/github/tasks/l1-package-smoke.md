@@ -1,5 +1,5 @@
 ---
-title: L1 公开下载包可得性与 3 轮反复用复验（常驻，版本走 brief）
+title: 安装包下载与启动自检
 period: day
 followUp:
   maxPerDay: 3

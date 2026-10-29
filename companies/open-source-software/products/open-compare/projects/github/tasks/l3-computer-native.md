@@ -1,5 +1,5 @@
 ---
-title: L3 桌面系统窗口验收（原生面板 / 启动参数 / 打包壳）
+title: 桌面系统窗口实测
 computer: true
 period: day
 ---

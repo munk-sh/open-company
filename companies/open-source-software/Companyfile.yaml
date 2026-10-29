@@ -1,5 +1,5 @@
 spec: open-company/v0
 id: 7a3e6bc7-1345-4191-9222-3bd4c25e1e9e
-name: 开源软件公司 (Open Source Software Company)
-description: 孵化、研发、验收并持续运营高品质开源桌面与开发者工具的 AI 软件公司模板（内含 OpenCompare 标杆案例）。
+name: 开源软件团队 (Open-Source Software Team)
+description: 一支替你持续维护开源软件的 AI 团队：有人盯 GitHub Issue 和构建报错、有人写代码、有人在真实桌面上做打包与界面测试、有人每天定时发版（内含实战项目 OpenCompare）。
 homepage: https://opencompany.run

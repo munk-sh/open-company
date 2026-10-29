@@ -6,21 +6,21 @@
       "slug": "open-source-software",
       "id": "7a3e6bc7-1345-4191-9222-3bd4c25e1e9e",
       "name": {
-        "zh": "开源软件公司",
-        "en": "Open Source Software Company"
+        "zh": "开源软件团队",
+        "en": "Open-Source Software Team"
       },
       "description": {
-        "zh": "孵化、研发、验收并持续运营高品质开源桌面与开发者工具的 AI 软件公司模板（内含 OpenCompare 标杆案例）。",
-        "en": "An AI software company template for incubating, building, verifying, and operating production-grade open-source desktop & developer tools (featuring OpenCompare)."
+        "zh": "一支替你持续维护开源软件的 AI 团队：有人盯 GitHub Issue 和构建报错、有人写代码、有人在真实桌面上做打包与界面测试、有人每天定时发版。内含实战项目 OpenCompare。",
+        "en": "An AI team that maintains open-source software end to end: watching GitHub issues & CI, writing code, testing real desktop builds, and cutting daily releases. Includes OpenCompare as a live project."
       },
       "opsHighlights": {
         "zh": [
-          "每日 21:00 全公司推进对账与跨产品经验提炼",
-          "原生桌面操作通道（computer）"
+          "daily-patrol：每晚 21:00 盘点全团队进度，把踩坑经验写回共享规则",
+          "computer：需要使用真实电脑桌面点击操作时的公共执行通道"
         ],
         "en": [
-          "Daily 21:00 cross-product progress & experience patrol",
-          "Native desktop operator channel (computer)"
+          "daily-patrol: 21:00 nightly progress review & shared lessons update",
+          "computer: Shared operator channel for real desktop GUI actions"
         ]
       },
       "sourceUrl": "https://github.com/munk-sh/open-company/tree/main/companies/open-source-software",
@@ -43,7 +43,7 @@
           "tasks": [
             {
               "id": "daily-patrol",
-              "title": "每日经营与经验巡检"
+              "title": "晚间进度盘点与经验总结"
             }
           ]
         }
@@ -55,36 +55,40 @@
           "lifecycle": "live",
           "git": "https://github.com/chaxiu/OpenCompare",
           "branch": "main",
+          "summary": {
+            "zh": "配备 7 项日常值班任务：GitHub Issue 与构建报错盯盘、每日 07:00 定时发版、安装包启动自检、大文件夹性能测试、软件界面交互实测、桌面系统窗口实测、发版后自动回帖关单。",
+            "en": "Equipped with 7 standing shifts: GitHub issue & CI watch, 07:00 daily release, installer smoke check, large-folder stress test, UI interaction check, native window check, and post-release issue replies."
+          },
           "projectsCount": 1,
           "tasksCount": 7,
           "tasks": [
             {
               "id": "github-issue-pr-actions",
-              "title": "GitHub 高频应急哨兵（Issue / PR / Actions 异常）"
+              "title": "GitHub Issue 与构建报错盯盘"
             },
             {
               "id": "issue-closeout",
-              "title": "版本发布对外回帖与 Issue 收口（按版本手动触发）"
+              "title": "新版本发布后自动回帖关单"
             },
             {
               "id": "l1-package-smoke",
-              "title": "L1 公开下载包可得性与 3 轮反复用复验（常驻，版本走 brief）"
+              "title": "安装包下载与启动自检"
             },
             {
               "id": "l2-large-dir-load",
-              "title": "L2 大目录四条负载腿复验（真实大仓双 tag，常驻，版本走 brief）"
+              "title": "大文件夹加载性能测试"
             },
             {
               "id": "l3-cdp-ui",
-              "title": "L3 渲染层实机验收（浏览器 / CDP 驱动）"
+              "title": "软件界面交互实测"
             },
             {
               "id": "l3-computer-native",
-              "title": "L3 桌面系统窗口验收（原生面板 / 启动参数 / 打包壳）"
+              "title": "桌面系统窗口实测"
             },
             {
               "id": "release-batch",
-              "title": "每日 07:00 批次发版（有当日迭代才发，推 tag 前等人放行）"
+              "title": "每日 07:00 定时发版"
             }
           ]
         }

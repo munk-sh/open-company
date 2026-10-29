@@ -1,5 +1,5 @@
 ---
-title: 版本发布对外回帖与 Issue 收口（按版本手动触发）
+title: 新版本发布后自动回帖关单
 period: day
 followUp:
   maxPerDay: 3
