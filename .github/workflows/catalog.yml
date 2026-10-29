@@ -1,0 +1,28 @@
+name: Verify & Build Catalog
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build catalog.json
+        run: node scripts/build-catalog.mjs
+
+      - name: Verify catalog.json is up to date
+        run: |
+          if ! git diff --exit-code catalog.json; then
+            echo "::error::catalog.json is out of sync. Run 'node scripts/build-catalog.mjs' and commit the changes."
+            exit 1
+          fi

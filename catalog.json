@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "repo": "https://github.com/munk-sh/open-company",
+  "companies": [
+    {
+      "slug": "open-source-software",
+      "id": "7a3e6bc7-1345-4191-9222-3bd4c25e1e9e",
+      "name": {
+        "zh": "开源软件公司",
+        "en": "Open Source Software Company"
+      },
+      "description": {
+        "zh": "孵化、研发、验收并持续运营高品质开源桌面与开发者工具的 AI 软件公司模板（内含 OpenCompare 标杆案例）。",
+        "en": "An AI software company template for incubating, building, verifying, and operating production-grade open-source desktop & developer tools (featuring OpenCompare)."
+      },
+      "opsHighlights": {
+        "zh": [
+          "每日 21:00 全公司推进对账与跨产品经验提炼",
+          "原生桌面操作通道（computer）"
+        ],
+        "en": [
+          "Daily 21:00 cross-product progress & experience patrol",
+          "Native desktop operator channel (computer)"
+        ]
+      },
+      "sourceUrl": "https://github.com/munk-sh/open-company/tree/main/companies/open-source-software",
+      "deepLink": "munk://company/import?url=https%3A%2F%2Fgithub.com%2Fmunk-sh%2Fopen-company%2Ftree%2Fmain%2Fcompanies%2Fopen-source-software",
+      "opsProjectsCount": 2,
+      "opsProjects": [
+        {
+          "id": "computer",
+          "tasksCount": 1,
+          "tasks": [
+            {
+              "id": "computer",
+              "title": "电脑"
+            }
+          ]
+        },
+        {
+          "id": "daily-patrol",
+          "tasksCount": 1,
+          "tasks": [
+            {
+              "id": "daily-patrol",
+              "title": "每日经营与经验巡检"
+            }
+          ]
+        }
+      ],
+      "products": [
+        {
+          "id": "open-compare",
+          "title": "OpenCompare",
+          "lifecycle": "live",
+          "git": "https://github.com/chaxiu/OpenCompare",
+          "branch": "main",
+          "projectsCount": 1,
+          "tasksCount": 7,
+          "tasks": [
+            {
+              "id": "github-issue-pr-actions",
+              "title": "GitHub 高频应急哨兵（Issue / PR / Actions 异常）"
+            },
+            {
+              "id": "issue-closeout",
+              "title": "版本发布对外回帖与 Issue 收口（按版本手动触发）"
+            },
+            {
+              "id": "l1-package-smoke",
+              "title": "L1 公开下载包可得性与 3 轮反复用复验（常驻，版本走 brief）"
+            },
+            {
+              "id": "l2-large-dir-load",
+              "title": "L2 大目录四条负载腿复验（真实大仓双 tag，常驻，版本走 brief）"
+            },
+            {
+              "id": "l3-cdp-ui",
+              "title": "L3 渲染层实机验收（浏览器 / CDP 驱动）"
+            },
+            {
+              "id": "l3-computer-native",
+              "title": "L3 桌面系统窗口验收（原生面板 / 启动参数 / 打包壳）"
+            },
+            {
+              "id": "release-batch",
+              "title": "每日 07:00 批次发版（有当日迭代才发，推 tag 前等人放行）"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
