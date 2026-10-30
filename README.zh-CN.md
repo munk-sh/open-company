@@ -1,9 +1,16 @@
-# Open Company — 多 Agent 协作的开放标准
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./brand/wordmark-dark.svg">
+    <img src="./brand/wordmark.svg" alt="Open Company" width="320">
+  </picture>
+</p>
 
-[English](./README.md) · [opencompany.run](https://opencompany.run) · [协作规范 (open-company.org)](https://open-company.org) · [Munk AI](https://munk.sh)
+<h3 align="center">多 Agent 协作的开放标准</h3>
 
-**多 Agent 协作的开放标准。**  
-用一套纯文本目录定义目标、分工与排班，让来自不同服务商的 Agent 像一家公司一样协同运转。
+<p align="center">
+  用一套纯文本目录定义目标、分工与排班，让来自不同服务商的 Agent 像一家公司一样协同运转。<br>
+  <a href="./README.md">English</a> · <a href="https://opencompany.run">opencompany.run</a> · <a href="https://open-company.org">协作规范 (open-company.org)</a> · <a href="https://munk.sh">Munk AI</a>
+</p>
 
 ---
 
@@ -13,10 +20,36 @@
 
 **Open Company（`open-company/v0`）** 把一套多 Agent 团队的编制写进普通文件夹里：
 
-- `Companyfile.yaml`：声明这是哪支团队
-- `AGENTS.md`：全员共享的目标、分工边界与做事红线
-- `products/<id>/Productfile.yaml`：团队负责的产品或业务线
-- `projects/<id>/tasks/*.md`：每项日常值班任务（几点运行、由谁负责、怎么算干完）
+```text
+open-source-software/
+├── Companyfile.yaml          # 声明这是哪支团队
+├── AGENTS.md                 # 全员共享的目标、分工边界与做事红线
+├── projects/
+│   └── daily-patrol/         # 团队级日常任务（如每晚 21:00 复盘）
+└── products/
+    └── open-compare/
+        ├── Productfile.yaml  # 绑定产品与代码仓库
+        ├── AGENTS.md         # 产品功能边界、优先级与验收标准
+        └── projects/github/
+            ├── guards/       # 零 Token 预检脚本（有新动静才唤醒 Agent）
+            └── tasks/        # 7 条日常值班任务（盯盘、实测、07:00 发版、回帖）
+```
+
+每一项值班任务都是一个普通的 Markdown 文件，用 Frontmatter 定义排班与唤醒条件，用正文定义职责边界：
+
+```markdown
+---
+title: GitHub Issue 与构建报错盯盘
+trigger:
+  schedule: "*/5 * * * *"
+  guard: guards/github-sentinel.mjs
+period: day
+---
+
+作为一线分诊班次运行：
+1. 对新 Issue 做分类、礼貌回执并建立归档卡片。
+2. 本班次不直接修改产品源码——确认需要改代码的缺陷，交接给研发工作项处理。
+```
 
 只要遵循同一套目录结构，无论底层接的是哪家模型或 Agent，都能看着同一份文件各司其职——不管是维护开源软件、运营自媒体，还是打理一家网店。任何跑通的团队配置，都可以像开源代码一样被一键复制（Fork）并运行。
 
@@ -30,7 +63,7 @@
 
 **这支团队每天怎么配合运转？**
 
-1. **盯盘与分诊（每 5 分钟）**：先用零成本脚本检查 GitHub 有没有新 Issue、PR 评论或构建报错，有动静才唤醒 Agent 处理。
+1. **盯盘与分诊（每 5 分钟）**：先用零成本脚本（`guards/github-sentinel.mjs`）检查 GitHub 有没有新 Issue、PR 评论或构建报错，有动静才唤醒 Agent 处理。
 2. **独立分支开发**：写代码一律在独立分支目录里进行，不弄脏正在发版的主分支。
 3. **发版前三道实测**：
    - 安装包下载与启动自检（确认用户下载的安装包能正常打开）

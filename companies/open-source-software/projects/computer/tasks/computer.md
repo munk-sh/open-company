@@ -1,5 +1,5 @@
 ---
-title: 电脑
+title: 桌面系统图形界面操作
 computer: true
 period: day
 ---

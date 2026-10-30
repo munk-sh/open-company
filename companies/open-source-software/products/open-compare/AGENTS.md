@@ -34,7 +34,7 @@
 - 暂不排期 FTP / SFTP 远端对比，不预留远端抽象层。
 
 ## 三、技术选型与架构约定
-- **独立技术调研先行**：Planner 在拆解第一波前，使用 `tech-research` Skill 独立调研选定对 AI Agent 编码最友好、构建闭环最快、性能与桌面视觉体验达标的技术栈与开源组件。
+- **独立技术调研先行**：在拆解大功能前，先调研选定对 AI Agent 编码最友好、构建闭环最快、性能与桌面视觉体验达标的技术栈与开源组件。
 - **内置标准测试样本库（Sample Fixtures）降级为辅助入口**：内置样本仅用于快速演示与自动化回归，必须以显式标注的「加载演示样本」辅助入口提供、且可被用户跳过；**不得占据首屏主工作流，也不作为任何验收/达标的判定口径**——达标一律以真实文件端到端读写为准。保留的样本内容：
   1. 双目录树对比样本（含多层嵌套、修改文件、左右独有文件及被打乱层级的待归位样本目录）；
   2. 代码双栏 Diff 样本与含多处标准冲突块的 `base / ours / theirs` 三向合并样本；
@@ -43,13 +43,12 @@
 
 ## 四、桌面实机验收核心路径（真实文件端到端读写，全程零样本依赖）
 
-- 研发工作项流水线固定为 `coding → code_gates → delivery`，**不在 WorkItem 内跑 `self_test`**。
-- 本节五步是 **L3 验收入口**，只由 Product Ops 中挂 `product-qa` 的任务执行并维护该项目的 `qa-checklist.md`。
-- **默认走浏览器/CDP 场**：用 `--remote-debugging-port` 驱动真实窗口的 renderer，覆盖工作台、目录对比下钻、新建对比粘贴路径、多会话切换与关闭等渲染层路径。
-- **只有 CDP/浏览器驱动不了的系统窗口与原生通道才用 `computer` 场**：原生 `NSSavePanel` 导出/保存、系统文件选择器、打包态 argv 与 `opencompare://` 单实例接管、打包图标/About/原生菜单。
-- **L3 触发口径**：交付含渲染层可见变更时，L3 渲染层走查是条件必验项，发版前必须跑；纯文档 / 纯后台 patch 不跑，不设「每版必跑」。
-- 实机验收一场只排 2–3 条主路径（单场 30 分钟墙钟硬上限）：开工即建 `digest.md` 骨架，每验完一条立即追加结论与证据路径，静默 >20 分钟视为故障；未跑到的条目在 `qa-checklist.md` 保持未勾选并在 digest 写明原因。
+- 交付含界面可见变更时，发版前须通过桌面实机验收（纯文档或纯后台改动免跑）：
+  - **软件界面交互实测（`l3-cdp-ui`）**：用 `--remote-debugging-port` 驱动真实窗口的渲染层，覆盖对比工作台、目录对比下钻、新建对比粘贴路径、多会话切换与关闭等界面路径。
+  - **桌面系统窗口实测（`l3-computer-native`）**：针对原生 `NSSavePanel` 导出/保存、系统文件选择器、打包态命令行参数与 `opencompare://` 单实例接管、应用图标/关于面板/原生菜单，在真实桌面环境中测试。
+- 实机验收单场控制在 30 分钟以内：开工即建立 `digest.md` 骨架，每验完一条立即追加结论与证据路径。
 
+**五条核心必验路径：**
 1. 启动应用，验证冷启动即进入可直接使用的对比工作台（内置 Sample 降级为可跳过的辅助入口，不占首屏主工作流）。
 2. 真实文件/目录打开与拖拽：经系统文件选择器打开真实文件/目录，并支持拖入真实路径与真实体量，接受真实输入而非预置样本。
 3. 目录对比下钻与返回：真实目录对比结果双击差异项可下钻到文件级对比视图，并能逐级返回上级目录视图，往返不丢状态。
@@ -70,27 +69,22 @@
 - 路径上下文的唯一来源是 `PlatformPort`：`statPath` 探测 + `homeDirectory()` / `workingDirectory()`（Web 端返回 `/memory`），`~` 与相对路径展开只在这里取上下文，renderer 不得自行猜测。
 - `openFilePair` / `runSidesCompare` 返回 `boolean` 并接受 `onError`：新入口（对话框、启动参数、URL、拖拽）失败必须就地提示且不建 tab、不替换现有会话，禁止退回「吞错误 + workbench notice」。
 - 品牌图标源为 `build/icons/icon.svg`，生成的多尺寸 PNG / icns / ico 必须入库（二进制不忽略）；`build/*.mjs` 生成脚本沿用 `eslint.config.mjs` 的 node globals override。
-- 发布约定：版本号唯一来源是 `package.json#version`，发布门测试与 `release.yml` 断言从它推导（内联版本字面量不再新增）；已公开的 tag 永不重写、强推或删除，发布通道会拒绝把既有 tag 指向不同 commit——发版失败就新建补丁版本。
-- 发版只走运营发布任务（每日 07:00 批次发版，cron `0 7 * * *`）：日常按窗口自动跑，急修由负责人手动触发。推 tag / 触发 Release CI / 核验公开产物都由该任务在内部用 `munk_task_publish` 完成；负责人**禁止**把 `git tag` / `git push` / 手动执行命令当成交办给人类的事项。只有该任务自己撞上 403 时，才把报错里的 `request` 原样提 approve。
-- README 保持 9 节精简双语结构：`README.md` 英文默认、`README.zh-CN.md` 中文镜像，两版第 3 行互链、H2 一一对应、英文正文 ≤700 词。第 5 行只保留一行「最新公开版本 → Releases 页」，**指向已发布版本，不随 `package.json#version` bump 变动**；版本收敛项不得改 README，发布完成后由收尾提交同时改两版这一行与 `release-packaging.test.ts` 的 `latestPublishedTag` 锚点。
-- 同一时间只允许一个正式 Release 在收口：修复代码可先合 main，但不打包、不 bump 版本、不发版；上一版公开件 L1 复验 digest 未落地前不发下一版。
-- AppImage 内嵌 blockmap 自洽门：`.AppImage` 尾部 4 字节是 **大端**，门实现必须同读两种字节序、先按「候选值 ≤ 文件大小」上界过滤再与 `latest-linux.yml` 的 `blockMapSize` 比对，两侧都不等/声明缺失/AppImage 不唯一时 fail-closed。
+- 发布约定：版本号唯一来源是 `package.json#version`，发布门测试与 `release.yml` 断言从它推导（内联版本字面量不再新增）；已公开的 tag 永不重写、强推或删除，发版失败就新建补丁版本。
+- README 保持 9 节精简双语结构：`README.md` 英文默认、`README.zh-CN.md` 中文镜像，两版第 3 行互链、H2 一一对应、英文正文 ≤700 词。第 5 行只保留一行「最新公开版本 → Releases 页」，**指向已发布版本，不随 `package.json#version` bump 变动**；发布完成后同步更新两版这一行与 `release-packaging.test.ts` 的 `latestPublishedTag` 锚点。
 
-## 六、对外承诺与自动化口径
+## 六、对外承诺与日常值班配置
 
-- 对外写下的自动化承诺（如「Issue 巡检」）必须与对应运营任务的 `scheduleEnabled` / cron 一致；要么按时开着钟，要么先把 README / 帖子里的口径改成人工巡检，不允许承诺与钟长期不一致。
-- 哨兵类 guard（`guards/*.mjs`）只按「`state/seen.txt` 里未见过的 issue / PR / 失败 run 集合」判定唤醒：窗口滚动、已被同分支更晚绿色 run 取代的失败、同一 run 的分支标签变化都不算新事件；游标由当班按 guard 实跑 marker 回写，收工前复跑必须 exit=1。
-- guard 退出码口径：`exit=0` = 有新事件、唤醒；`exit=1` = 无新事件、不唤醒；`exit=2` = guard 自身出错。已处理但尚未闭环的条目（例如已回执、仍 open 的 Issue）指纹必须原样留在 `seen.txt`，**禁止从游标里删掉未完成指纹**。
-- 读者报的崩溃/数据错误修完发版后，必须回到原帖与对应 Issue 回帖写明修复版本与验证口径，并 close 该 Issue；不做「发完版就算完」。
-- **对外回帖身份固定为 `munk-agent`**：GitHub 回帖 / 打标签 / 关单一律走 `node guards/gh.mjs`（向上查找 `config.toml` 取 `[github].munk_agent_token`），**禁止用本机个人 `gh` 登录代发**。回帖后必须复核作者 `author.login === munk-agent`；`gh.mjs` 报 `github auth missing` / 403 时记 digest + `needsOwner: true` 并停手，不得退回裸 `gh`。
-- **运营任务固定 7 条常驻槽位**（按「验收 / 发版 / 对外收口 / 巡检」四类）：
-  1. `github-issue-pr-actions`（GitHub 高频哨兵，定时自足）
-  2. `release-batch`（07:00 批次发版，定时自足）
-  3. `l1-package-smoke`（L1 公开包可得性与 3 轮复验，brief 驱动）
-  4. `l2-large-dir-load`（L2 四条大目录负载腿，brief 驱动）
-  5. `l3-cdp-ui`（L3 渲染层 CDP 实机验收，brief 驱动）
-  6. `l3-computer-native`（L3 原生窗口 / 面板 computer 场，brief 驱动）
-  7. `issue-closeout`（版本发布对外回帖与 Issue 收口，brief 驱动）
+- 哨兵预检脚本（`guards/*.mjs`）只按「`state/seen.txt` 里未见过的 issue / PR / 失败 run 集合」判定唤醒：窗口滚动、已被同分支更晚绿色 run 取代的失败、同一 run 的分支标签变化都不算新事件；游标由当班按 guard 实跑 marker 回写，收工前复跑必须 `exit=1`。
+- guard 退出码口径：`exit=0` = 有新事件、唤醒 Agent；`exit=1` = 无新事件、不唤醒；`exit=2` = guard 自身出错。已回执但尚未关单的条目指纹必须原样留在 `seen.txt`，**禁止从游标里删掉未完成指纹**。
+- **对外回帖身份固定为 `munk-agent`**：GitHub 回帖 / 打标签 / 关单一律走 `node guards/gh.mjs`（读取 `[github].munk_agent_token`），**禁止用本机个人 `gh` 登录代发**。回帖后必须复核作者 `author.login === munk-agent`。
+- **日常运营固定 7 条值班任务**：
+  1. `github-issue-pr-actions`（GitHub Issue 与构建报错盯盘，每 5 分钟定时预检）
+  2. `release-batch`（每日 07:00 定时发版）
+  3. `l1-package-smoke`（安装包下载与启动自检，按需触发）
+  4. `l2-large-dir-load`（大文件夹加载性能测试，按改动触发）
+  5. `l3-cdp-ui`（软件界面交互实测，按改动触发）
+  6. `l3-computer-native`（桌面系统窗口实测，按改动触发）
+  7. `issue-closeout`（新版本发布后自动回帖关单，发版后触发）
 
 ## 七、大目录性能与虚拟滚动架构约定
 

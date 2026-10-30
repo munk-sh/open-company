@@ -7,18 +7,8 @@ source:
   commit: e86980ff2742bff5f28c5eb368e5d82ebfbab0ac
   branch: main
 groups:
-  - id: acquire
-    title: Acquisition
-  - id: retain
-    title: Retention
-  - id: revenue
-    title: Revenue
-  - id: care
-    title: Care
-  - id: insight
-    title: Insights
   - id: ship
-    title: 发布
+    title: 发布与社区运营
 projects:
   - id: github
     title: GitHub 开源发布与社区运营
