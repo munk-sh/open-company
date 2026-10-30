@@ -16,7 +16,7 @@
 
 ## Why Open Company?
 
-Individual AI agents (Claude, GPT, Gemini, local models) are already capable at single tasks, but they lack a shared structure to **work together on an ongoing operation**. Prompting agents one by one in chat windows leaves them with no role boundaries, no handoff rules, and no shared memory.
+Individual AI agents (Claude Code, Codex, Gemini CLI, OpenCode, etc.) are already capable at single tasks, but they lack a shared structure to **work together on an ongoing operation**. Prompting agents one by one in chat windows leaves them with no role boundaries, no handoff rules, and no shared memory.
 
 **Open Company (`open-company/v0`)** puts the structure of an agent team into a standard folder on disk:
 

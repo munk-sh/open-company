@@ -16,7 +16,7 @@
 
 ## 为什么需要 Open Company？
 
-今天我们不缺强大的单点 Agent（Claude、GPT、Gemini、本地模型……），缺的是让它们**配合起来长期干一件事**的标准。靠聊天窗口临时派活时，Agent 之间没有分工边界、没有交接标准、也没有共同记忆。
+今天我们不缺强大的单点 Agent（Claude Code、Codex、Gemini CLI、OpenCode……），缺的是让它们**配合起来长期干一件事**的标准。靠聊天窗口临时派活时，Agent 之间没有分工边界、没有交接标准、也没有共同记忆。
 
 **Open Company（`open-company/v0`）** 把一套多 Agent 团队的编制写进普通文件夹里：
 
