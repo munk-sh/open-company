@@ -88,17 +88,46 @@ function parseScalarYaml(text) {
   return result;
 }
 
+function parseSourceBlock(text) {
+  const source = {};
+  let inBlock = false;
+  for (const rawLine of text.split(/\r?\n/)) {
+    if (!inBlock) {
+      if (/^source:\s*$/.test(rawLine)) inBlock = true;
+      continue;
+    }
+    if (/^\S/.test(rawLine)) break;
+    const match = /^\s+([a-zA-Z0-9_-]+):\s*(.*)$/.exec(rawLine);
+    if (!match) continue;
+    let val = match[2].trim().replace(/\s+#.*$/, "").trim();
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      val = val.slice(1, -1);
+    }
+    if (val !== "") source[match[1]] = val;
+  }
+  return source;
+}
+
 function parseProductYaml(text) {
   const base = parseScalarYaml(text);
-  const gitMatch = /\n\s+git:\s*([^\s#]+)/.exec(text);
-  const branchMatch = /\n\s+branch:\s*([^\s#]+)/.exec(text);
-  const unquote = (val) => val.trim().replace(/^['"]|['"]$/g, "");
+  const raw = parseSourceBlock(text);
+  const declared = raw.git || raw.path || "";
+  const type = raw.git ? "git" : raw.path ? "path" : "";
   return {
     id: base.id || "",
     title: base.title || base.id || "",
     lifecycle: base.lifecycle || "live",
-    git: gitMatch ? unquote(gitMatch[1]) : "",
-    branch: branchMatch ? unquote(branchMatch[1]) : "main",
+    git: declared,
+    commit: raw.commit || "",
+    branch: raw.branch || "main",
+    source: type
+      ? {
+          type,
+          ref: declared,
+          commit: raw.commit || "",
+          branch: raw.branch || "main",
+        }
+      : null,
   };
 }
 
@@ -179,7 +208,9 @@ function scanCompany(slug) {
       title: parsedProduct.title || productSlug,
       lifecycle: parsedProduct.lifecycle,
       git: parsedProduct.git,
+      commit: parsedProduct.commit,
       branch: parsedProduct.branch,
+      source: parsedProduct.source,
       summary: BILINGUAL_METADATA[slug]?.productSummaries?.[productId] ?? null,
       projectsCount: pProjects.length,
       tasksCount: allTasks.length,
