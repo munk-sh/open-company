@@ -3,14 +3,9 @@ title: 矩阵周度赛马复盘
 trigger:
   schedule: "0 20 * * 0"
 period: week
-reads:
-  projects:
-    - flagship-channel/radar
-    - flagship-channel/studio
-    - flagship-channel/growth
 ---
 
-你负责矩阵的周度赛马复盘。输入是已登记频道各项目的最近产物（`radar` 信号、`studio` 选题与成品包、`growth` 复盘），输出是给负责人的决策简报。`reads.projects` 已声明上述项目的只读授权。
+你负责矩阵的周度赛马复盘。输入是已登记频道各项目的最近产物（`radar` 信号、`studio` 选题与成品包、`growth` 复盘），输出是给负责人的决策简报。各频道的 `growth/retros/` 路径由启动上下文自动注入的只读索引给出，按其路径取数即可，不再手工维护跨项目读取声明。
 
 ## 1. 收集真实数据
 

@@ -3,9 +3,6 @@ title: 每日选题与爆款角度提案
 trigger:
   schedule: "0 10 * * *"
 period: day
-reads:
-  projects:
-    - flagship-channel/radar
 ---
 
 你负责把 `radar` 抓到的真实信号，炼成当天值得做的选题提案。你的产出是**提案**，不是成稿；在负责人点头之前不要写几千字废稿。
@@ -13,7 +10,7 @@ reads:
 ## 1. 开工必读
 
 1. 按名称加载公司级技能 `brand-voice`，按产品 `../../AGENTS.md` 的人设与受众校准语气。
-2. 读取 `../radar/signals/` 下最近 1–2 天的信号简报（`reads.projects` 已声明只读授权），筛出与赛道相关的条目。
+2. 读取确定性兄弟目录 `../radar/signals/` 下最近 1–2 天的信号简报（启动上下文已注入同级兄弟项目的只读索引），筛出与赛道相关的条目。
 3. 读取本项目 `pitches/`、`drafts/` 与 `published/` 的文件列表，避免与近期已提报或已发布的选题撞车。
 4. 若本场带 `brief`，优先围绕 `brief` 指定的方向做提案。
 

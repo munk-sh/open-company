@@ -139,17 +139,19 @@ test("所有任务 frontmatter 满足 title / schedule+period / guard 契约", (
 
   const dailyPitch = read("companies/self-media/products/flagship-channel/projects/studio/tasks/daily-topic-pitch.md");
   assert.match(dailyPitch, /^ {2}schedule: "0 10 \* \* \*"$/m);
-  assert.match(dailyPitch, /flagship-channel\/radar/);
+  assert.match(dailyPitch, /\.\.\/radar\/signals\//);
 
   const matrixReview = read("companies/self-media/projects/matrix-hq/tasks/weekly-matrix-review.md");
   assert.match(matrixReview, /^ {2}schedule: "0 20 \* \* 0"$/m);
   assert.match(matrixReview, /^period: week$/m);
-  assert.match(matrixReview, /flagship-channel\/growth/);
+  assert.match(matrixReview, /growth\/retros\//);
+  assert.match(matrixReview, /启动上下文/);
 
   const retro = read("companies/self-media/products/flagship-channel/projects/growth/tasks/weekly-channel-retro.md");
   assert.match(retro, /^ {2}schedule: "0 19 \* \* 0"$/m);
   assert.match(retro, /^period: week$/m);
-  assert.match(retro, /flagship-channel\/studio/);
+  assert.match(retro, /\.\.\/studio\/published\//);
+  assert.match(retro, /\.\.\/radar\/signals\//);
 });
 
 test("全目录无历史虚构数据或旧脚本引用残留", () => {
@@ -215,18 +217,6 @@ test("catalog.json 连续两次构建输出稳定", () => {
   assert.equal(read("catalog.json"), first, "catalog.json must be byte-stable across builds");
 });
 
-function readsProjects(fm) {
-  const block = /^reads:\n {2}projects:\n((?: {4}- \S+\n?)+)/m.exec(fm);
-  assert.ok(block, "frontmatter must declare reads.projects");
-  const list = block[1]
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => line.replace(/^- /, ""));
-  assert.ok(list.length > 0, "reads.projects must not be empty");
-  return list;
-}
-
 test("ac-1 项目产物路径落在各自项目工作目录，技能按名称加载", () => {
   for (const name of listFiles(companyDir)) {
     if (/\.(png|jpg|jpeg|gif|webp|ico|woff2?|ttf)$/i.test(name)) continue;
@@ -251,7 +241,7 @@ test("ac-1 项目产物路径落在各自项目工作目录，技能按名称加
 
   const dailyPitch = read("companies/self-media/products/flagship-channel/projects/studio/tasks/daily-topic-pitch.md");
   assert.match(dailyPitch, /pitches\/YYYY-MM-DD\.md/);
-  assert.match(dailyPitch, /^ {4}- flagship-channel\/radar$/m);
+  assert.match(dailyPitch, /\.\.\/radar\/signals\//);
 
   const draft = read("companies/self-media/products/flagship-channel/projects/studio/tasks/multi-platform-draft.md");
   assert.match(draft, /drafts\/YYYY-MM-DD-<slug>\//);
@@ -266,24 +256,32 @@ test("ac-1 项目产物路径落在各自项目工作目录，技能按名称加
   assert.equal(retro.includes("code/"), false, "growth 复盘不得引用失效的 code/ 目录");
 });
 
-test("ac-2 跨项目读取上游产物的任务显式声明 reads.projects", () => {
-  const expectations = {
-    "companies/self-media/products/flagship-channel/projects/studio/tasks/daily-topic-pitch.md": ["flagship-channel/radar"],
-    "companies/self-media/products/flagship-channel/projects/studio/tasks/multi-platform-draft.md": ["flagship-channel/radar"],
-    "companies/self-media/products/flagship-channel/projects/growth/tasks/weekly-channel-retro.md": [
-      "flagship-channel/radar",
-      "flagship-channel/studio",
-    ],
-    "companies/self-media/projects/matrix-hq/tasks/weekly-matrix-review.md": [
-      "flagship-channel/radar",
-      "flagship-channel/studio",
-      "flagship-channel/growth",
-    ],
-  };
+test("ac-2 self-media 全部任务 frontmatter 不再包含历史 reads 字段", () => {
+  const taskFiles = listFiles(companyDir).filter((name) => name.includes("/tasks/") && name.endsWith(".md"));
+  assert.ok(taskFiles.length >= 6, "expected all standing shifts to be present");
 
-  for (const [relPath, expected] of Object.entries(expectations)) {
-    assert.deepEqual(readsProjects(frontmatter(read(relPath))), expected, `${relPath}: reads.projects mismatch`);
+  for (const name of taskFiles) {
+    const relPath = `companies/self-media/${name}`;
+    const fm = frontmatter(read(relPath));
+    assert.doesNotMatch(fm, /^reads:\s*$/m, `${relPath}: 历史 reads 字段必须移除`);
+    assert.doesNotMatch(fm, /^ {2}projects:\s*$/m, `${relPath}: 历史 reads.projects 块必须移除`);
   }
+});
+
+test("ac-2 产品内跨项目协作按确定性 ../<slug> 与启动只读索引寻址", () => {
+  const dailyPitch = read("companies/self-media/products/flagship-channel/projects/studio/tasks/daily-topic-pitch.md");
+  assert.match(dailyPitch, /\.\.\/radar\/signals\//);
+
+  const draft = read("companies/self-media/products/flagship-channel/projects/studio/tasks/multi-platform-draft.md");
+  assert.match(draft, /\.\.\/radar\/signals\//);
+
+  const retro = read("companies/self-media/products/flagship-channel/projects/growth/tasks/weekly-channel-retro.md");
+  assert.match(retro, /\.\.\/studio\/published\//);
+  assert.match(retro, /\.\.\/radar\/signals\//);
+
+  const matrixReview = read("companies/self-media/projects/matrix-hq/tasks/weekly-matrix-review.md");
+  assert.match(matrixReview, /growth\/retros\//);
+  assert.match(matrixReview, /启动上下文/);
 });
 
 function guardFixture(watchlist) {

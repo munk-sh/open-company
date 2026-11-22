@@ -10,7 +10,7 @@
 
 - `flagship-channel`：首发样板频道，从 Day-0 空态开始，等待第一轮真实信号与复盘。
 
-新增频道后，在 `tasks/weekly-matrix-review.md` 的 `reads.projects` 中登记它的 `radar`、`studio` 与 `growth` 项目，下一轮周会即进入比较。跨项目读取靠这份声明获得只读授权，不要用相对路径越权访问。
+新增频道后，它的 `radar`、`studio` 与 `growth` 项目会随同作用域自动进入启动上下文的只读索引，`tasks/weekly-matrix-review.md` 按注入的 `growth/retros/` 路径取数即可，下一轮周会即进入比较；无需再手工维护跨项目读取声明。
 
 ## 赛马阈值口径
 
