@@ -54,7 +54,14 @@
           "title": "OpenCompare",
           "lifecycle": "live",
           "git": "https://github.com/chaxiu/OpenCompare",
+          "commit": "e86980ff2742bff5f28c5eb368e5d82ebfbab0ac",
           "branch": "main",
+          "source": {
+            "type": "git",
+            "ref": "https://github.com/chaxiu/OpenCompare",
+            "commit": "e86980ff2742bff5f28c5eb368e5d82ebfbab0ac",
+            "branch": "main"
+          },
           "summary": {
             "zh": "配备 7 项日常值班任务：GitHub Issue 与构建报错盯盘、每日 07:00 定时发版、安装包启动自检、大文件夹性能测试、软件界面交互实测、桌面系统窗口实测、发版后自动回帖关单。",
             "en": "Equipped with 7 standing shifts: GitHub issue & CI watch, 07:00 daily release, installer smoke check, large-folder stress test, UI interaction check, native window check, and post-release issue replies."
@@ -139,8 +146,15 @@
           "id": "flagship-channel",
           "title": "首发样板频道",
           "lifecycle": "live",
-          "git": "",
+          "git": "./code",
+          "commit": "0000000",
           "branch": "main",
+          "source": {
+            "type": "path",
+            "ref": "./code",
+            "commit": "0000000",
+            "branch": "main"
+          },
           "summary": {
             "zh": "首发样板频道：从 Day-0 空态开始，含 radar 热点哨兵（每小时）、studio 每日选题与多平台成品包、growth 周度复盘，用真实数据验证方向是否值得加注。",
             "en": "Flagship starter channel: starts from an honest Day-0 empty state with an hourly radar sentinel, daily topic pitches and multi-platform draft packages, plus weekly growth retros to prove whether the direction deserves more investment."

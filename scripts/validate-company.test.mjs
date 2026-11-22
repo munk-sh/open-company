@@ -183,3 +183,32 @@ test("catalog.json 由构建脚本生成且包含 self-media 双语元数据", (
   assert.equal(selfMedia.products[0].branch, "main");
   assert.equal(selfMedia.products[0].projectsCount, 3);
 });
+
+test("catalog.json 忠实保留 Productfile 的 source.path 与 source.git", () => {
+  execFileSync(process.execPath, ["scripts/build-catalog.mjs"], { cwd: repoRoot, stdio: "pipe" });
+  const catalog = JSON.parse(read("catalog.json"));
+
+  const selfMedia = catalog.companies.find((company) => company.slug === "self-media");
+  const flagship = selfMedia.products.find((product) => product.id === "flagship-channel");
+  assert.equal(flagship.git, "./code");
+  assert.notEqual(flagship.git, "", "source.path must not degrade into an empty git field");
+  assert.equal(flagship.source.type, "path");
+  assert.equal(flagship.source.ref, "./code");
+  assert.equal(flagship.branch, "main");
+
+  const oss = catalog.companies.find((company) => company.slug === "open-source-software");
+  const openCompare = oss.products.find((product) => product.id === "open-compare");
+  assert.equal(openCompare.git, "https://github.com/chaxiu/OpenCompare");
+  assert.equal(openCompare.commit, "e86980ff2742bff5f28c5eb368e5d82ebfbab0ac");
+  assert.equal(openCompare.branch, "main");
+  assert.equal(openCompare.source.type, "git");
+  assert.equal(openCompare.source.ref, "https://github.com/chaxiu/OpenCompare");
+  assert.equal(openCompare.source.commit, "e86980ff2742bff5f28c5eb368e5d82ebfbab0ac");
+});
+
+test("catalog.json 连续两次构建输出稳定", () => {
+  execFileSync(process.execPath, ["scripts/build-catalog.mjs"], { cwd: repoRoot, stdio: "pipe" });
+  const first = read("catalog.json");
+  execFileSync(process.execPath, ["scripts/build-catalog.mjs"], { cwd: repoRoot, stdio: "pipe" });
+  assert.equal(read("catalog.json"), first, "catalog.json must be byte-stable across builds");
+});
