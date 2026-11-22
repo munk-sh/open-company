@@ -1,9 +1,6 @@
 ---
 title: 多平台成品包生成
 period: day
-reads:
-  projects:
-    - flagship-channel/radar
 ---
 
 本任务为**按需手动槽位**：负责人在选题拍板后，通过 `POST /tasks/:taskId/runs` 携带 `brief` 点名启动，按指定角度一次性生成多平台成品包。没有 `brief` 时，先读最近一份选题提案并请负责人确认，不要盲目开写。
@@ -13,7 +10,7 @@ reads:
 1. 读取 `brief`：核心立意、要引用的 `radar` 信号路径、目标平台。
 2. 读取产品 `../../AGENTS.md` 的人设、受众与写稿规范。
 3. 按名称加载公司级技能 `brand-voice`，按去 AI 味三刀手术执行。
-4. 读取本项目 `pitches/` 中对应的选题提案作为骨架；需要回看原始信号时，读取 `../radar/signals/`（`reads.projects` 已声明只读授权）。
+4. 读取本项目 `pitches/` 中对应的选题提案作为骨架；需要回看原始信号时，直接读取确定性兄弟目录 `../radar/signals/`（启动上下文已注入同级兄弟项目的只读索引）。
 
 ## 2. 产出完整成品包
 

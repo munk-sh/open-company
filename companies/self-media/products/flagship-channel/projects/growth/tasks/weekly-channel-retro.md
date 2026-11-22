@@ -3,17 +3,13 @@ title: 频道周度增长复盘
 trigger:
   schedule: "0 19 * * 0"
 period: week
-reads:
-  projects:
-    - flagship-channel/radar
-    - flagship-channel/studio
 ---
 
 你负责这个频道每周一次的增长复盘。输出要能被矩阵总控直接拿去做横向比较。
 
 ## 1. 收集本周事实
 
-1. 读取 `../studio/published/`：本周实际发布的内容、平台与发布时间（`reads.projects` 已声明只读授权）。
+1. 读取确定性兄弟目录 `../studio/published/`：本周实际发布的内容、平台与发布时间（启动上下文已注入同级兄弟项目的只读索引）。
 2. 读取 `../studio/drafts/`：已完成但待确认或未发布的成品包。
 3. 读取 `../studio/digest.md` 与 `../studio/pitches/` 选题记录，核对提案与实际产出。
 4. 读取 `../radar/signals/`：本周选题是否有真实公开信号支撑。

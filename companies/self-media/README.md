@@ -40,4 +40,4 @@ self-media/
 1. 复制 `products/flagship-channel` 为 `products/<new-channel>`。
 2. 修改 `Productfile.yaml` 的 `id` / `title` / `logins`，把频道定位写进 `goal.md` 与 `AGENTS.md`。
 3. 清空新频道 `studio` 项目的 `pitches/`、`drafts/` 与 `published/`，让它同样从真实的 Day-0 空态起跑。
-4. 在 `projects/matrix-hq/tasks/weekly-matrix-review.md` 的 `reads.projects` 中登记新频道的 `radar`、`studio` 与 `growth` 项目，进入周度赛马比较。
+4. 新频道的 `radar`、`studio` 与 `growth` 项目会随同作用域自动进入 `projects/matrix-hq` 启动上下文的只读索引，周度赛马复盘按注入的 `growth/retros/` 路径取数即可，无需手工登记跨项目读取声明。
