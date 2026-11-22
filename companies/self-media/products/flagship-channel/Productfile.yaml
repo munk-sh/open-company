@@ -1,0 +1,26 @@
+spec: open-company/v0
+id: flagship-channel
+title: 首发样板频道
+lifecycle: live
+source:
+  path: "./code"
+  commit: "0000000"
+  branch: "main"
+requires:
+  browser: true
+  logins:
+    - xiaohongshu
+    - x
+groups:
+  - id: channel-ops
+    title: 频道运营
+projects:
+  - id: radar
+    title: 热点雷达
+    group: channel-ops
+  - id: studio
+    title: 内容工坊
+    group: channel-ops
+  - id: growth
+    title: 频道增长复盘
+    group: channel-ops

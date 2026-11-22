@@ -1,3 +1,0 @@
-date,raw_source,description,amount_cny,type_hint
-2026-11-04,Stripe_Payout,海外配置包新增3笔美元订单折合人民币,860,income
-2026-11-04,Alipay_Bill,某云厂商对象存储OSS按量扣费,45,expense

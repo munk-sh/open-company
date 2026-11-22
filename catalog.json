@@ -3,130 +3,6 @@
   "repo": "https://github.com/munk-sh/open-company",
   "companies": [
     {
-      "slug": "one-person-company",
-      "id": "9b4e2f10-8c61-4d3a-9e72-5f1a8b3c4d90",
-      "name": {
-        "zh": "一人公司 · 超级个体",
-        "en": "One-Person Company"
-      },
-      "description": {
-        "zh": "一支替你运转「你自己」这家公司的 AI 幕僚班子：情报雷达盯风向、第二大脑攒认知、内容工坊做影响力、财富部门盯搞钱机会与账本、晨夕复盘管节奏与进化。直接跟公司负责人对话即可按需开关定制。",
-        "en": "An AI team that runs your one-person company: Intel Radar for external signals, Second Brain for knowledge synthesis, Content Studio for multi-platform publishing, Wealth & Deals for revenue opportunities & ledger analysis, and Daily Patrol for morning briefings & nightly evolution."
-      },
-      "opsHighlights": {
-        "zh": [
-          "radar：零 Token 预检 + 行业热点、舆情与信息差盯盘",
-          "brain：消化随手投喂的笔记、长文与录音，构建个人认知网",
-          "studio：把外部情报与个人观点裂变为多平台待发成稿并呈批",
-          "wealth：盯搞钱痛点、套利线索与收支数据算账",
-          "daily-patrol：早 08:00 一页纸拍板早报 + 晚 21:00 复盘进化"
-        ],
-        "en": [
-          "radar: Zero-token preflight watch for industry signals & trends",
-          "brain: Second brain that digests notes, links & voice memos into reusable insights",
-          "studio: Multi-platform content production staged for one-click human approval",
-          "wealth: Opportunity hunting, deal evaluation & personal ledger analytics",
-          "daily-patrol: 08:00 executive morning brief & 21:00 nightly review"
-        ]
-      },
-      "sourceUrl": "https://github.com/munk-sh/open-company/tree/main/companies/one-person-company",
-      "deepLink": "munk://company/import?url=https%3A%2F%2Fgithub.com%2Fmunk-sh%2Fopen-company%2Ftree%2Fmain%2Fcompanies%2Fone-person-company",
-      "opsProjectsCount": 5,
-      "opsProjects": [
-        {
-          "id": "brain",
-          "tasksCount": 2,
-          "tasks": [
-            {
-              "id": "inbox-digest",
-              "title": "碎片内化与常青认知卡合成"
-            },
-            {
-              "id": "weekly-synthesis",
-              "title": "周度认知串联与思维底座进化"
-            }
-          ]
-        },
-        {
-          "id": "daily-patrol",
-          "tasksCount": 3,
-          "tasks": [
-            {
-              "id": "mit-tracker",
-              "title": "今日重点战役进度盯盘"
-            },
-            {
-              "id": "morning-brief",
-              "title": "早间一页纸拍板简报"
-            },
-            {
-              "id": "nightly-review",
-              "title": "晚间进度盘点与规则进化"
-            }
-          ]
-        },
-        {
-          "id": "radar",
-          "tasksCount": 3,
-          "tasks": [
-            {
-              "id": "deep-recon",
-              "title": "专项情报深挖与竞品侦察"
-            },
-            {
-              "id": "signal-watch",
-              "title": "公开信源异动哨兵"
-            },
-            {
-              "id": "social-patrol",
-              "title": "社媒热点与跨网信息差巡检"
-            }
-          ]
-        },
-        {
-          "id": "studio",
-          "tasksCount": 4,
-          "tasks": [
-            {
-              "id": "content-forge",
-              "title": "母本打磨与多端精铸 (Multi-Channel Content Forge)"
-            },
-            {
-              "id": "topic-pitch",
-              "title": "每日选题炼金会 (Daily Topic Pitch)"
-            },
-            {
-              "id": "video-forge",
-              "title": "动态视频与演讲 Deck 精铸 (Motion Video Forge)"
-            },
-            {
-              "id": "voice-evolver",
-              "title": "语感进化与手改学习 (Voice Calibration & Evolver)"
-            }
-          ]
-        },
-        {
-          "id": "wealth",
-          "tasksCount": 3,
-          "tasks": [
-            {
-              "id": "cashflow-and-billing",
-              "title": "浏览器自动对账与收支订阅审计"
-            },
-            {
-              "id": "deal-and-quote",
-              "title": "搞钱火花毒舌尽调与商务报价参谋"
-            },
-            {
-              "id": "wealth-allocation-review",
-              "title": "净值盘点与资产配置再平衡体检"
-            }
-          ]
-        }
-      ],
-      "products": []
-    },
-    {
       "slug": "open-source-software",
       "id": "7a3e6bc7-1345-4191-9222-3bd4c25e1e9e",
       "name": {
@@ -213,6 +89,84 @@
             {
               "id": "release-batch",
               "title": "每日 07:00 定时发版"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "self-media",
+      "id": "8284ba1f-312b-4388-ba9d-e79bc96ccfd1",
+      "name": {
+        "zh": "自媒体矩阵",
+        "en": "Self-Media Matrix"
+      },
+      "description": {
+        "zh": "一套按「矩阵赛马」运营多账号自媒体的 AI 团队：顶层总控每周比较各频道真实转化，决定加注、冻结或淘汰，并把爆款结构沉淀为共享打法；内置首发样板频道 flagship-channel，自带零 Token 热点哨兵、选题工坊与频道复盘。",
+        "en": "An AI team that runs a multi-account media matrix as a channel race: a top-level HQ compares real conversion each week, decides which channels to scale, freeze, or retire, and distills winning structures into shared playbooks. Ships with a flagship-channel starter product with a zero-token signal sentinel, topic studio, and weekly retros."
+      },
+      "opsHighlights": {
+        "zh": [
+          "matrix-hq：每周日 20:00 汇总各频道增长复盘并给出赛马决策",
+          "radar：零 Token 公开源哨兵每小时扫描真实热点与跨网信息差",
+          "studio：每日 10:00 产出选题提案，拍板后生成多平台成品包",
+          "growth：每周日 19:00 用真实数据复盘频道方向"
+        ],
+        "en": [
+          "matrix-hq: Weekly Sunday 20:00 channel comparison and race decisions",
+          "radar: Zero-token hourly scan of public sources and cross-platform signal gaps",
+          "studio: 10:00 daily topic pitches, then multi-platform draft packages",
+          "growth: Sunday 19:00 channel retro backed by real data"
+        ]
+      },
+      "sourceUrl": "https://github.com/munk-sh/open-company/tree/main/companies/self-media",
+      "deepLink": "munk://company/import?url=https%3A%2F%2Fgithub.com%2Fmunk-sh%2Fopen-company%2Ftree%2Fmain%2Fcompanies%2Fself-media",
+      "opsProjectsCount": 1,
+      "opsProjects": [
+        {
+          "id": "matrix-hq",
+          "tasksCount": 1,
+          "tasks": [
+            {
+              "id": "weekly-matrix-review",
+              "title": "矩阵周度赛马复盘"
+            }
+          ]
+        }
+      ],
+      "products": [
+        {
+          "id": "flagship-channel",
+          "title": "首发样板频道",
+          "lifecycle": "live",
+          "git": "",
+          "branch": "main",
+          "summary": {
+            "zh": "首发样板频道：从 Day-0 空态开始，含 radar 热点哨兵（每小时）、studio 每日选题与多平台成品包、growth 周度复盘，用真实数据验证方向是否值得加注。",
+            "en": "Flagship starter channel: starts from an honest Day-0 empty state with an hourly radar sentinel, daily topic pitches and multi-platform draft packages, plus weekly growth retros to prove whether the direction deserves more investment."
+          },
+          "projectsCount": 3,
+          "tasksCount": 5,
+          "tasks": [
+            {
+              "id": "weekly-channel-retro",
+              "title": "频道周度增长复盘"
+            },
+            {
+              "id": "public-signal-scan",
+              "title": "公开信源热点哨兵"
+            },
+            {
+              "id": "social-trend-scan",
+              "title": "社媒热点与跨网信息差扫描"
+            },
+            {
+              "id": "daily-topic-pitch",
+              "title": "每日选题与爆款角度提案"
+            },
+            {
+              "id": "multi-platform-draft",
+              "title": "多平台成品包生成"
             }
           ]
         }
