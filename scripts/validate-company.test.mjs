@@ -395,3 +395,109 @@ test("ac-3 雷达守卫：至少一个源成功且无新信号退出 1，发现�
     assert.deepEqual(pending.items[0].matchedBoost, ["agent"]);
   });
 });
+
+const RACE_STATES = ["加注", "保持", "冻结", "淘汰"];
+const RETRO_ARCHIVE_PATH = "retros/weekly-YYYY-Www.md";
+const MATRIX_TASK = "companies/self-media/projects/matrix-hq/tasks/weekly-matrix-review.md";
+const GROWTH_TASK = "companies/self-media/products/flagship-channel/projects/growth/tasks/weekly-channel-retro.md";
+const MATRIX_README = "companies/self-media/projects/matrix-hq/README.md";
+const GROWTH_README = "companies/self-media/products/flagship-channel/projects/growth/README.md";
+
+function thresholdBlock(markdown, relPath) {
+  const match = /<!-- race-thresholds:start -->([\s\S]*?)<!-- race-thresholds:end -->/.exec(markdown);
+  assert.ok(match, `${relPath}: missing race-thresholds block`);
+  return match[1];
+}
+
+function thresholdNumbers(block) {
+  const found = block.match(/-?\d+(?:\.\d+)?/g) ?? [];
+  return [...new Set(found.map(Number))].sort((a, b) => a - b);
+}
+
+function tableRow(block, state, relPath) {
+  const row = block
+    .split("\n")
+    .find((line) => line.trim().startsWith(`| ${state} |`));
+  assert.ok(row, `${relPath}: 赛马判定表缺少「${state}」行`);
+  const cells = row.split("|").map((cell) => cell.trim()).slice(1, -1);
+  assert.equal(cells.length, 5, `${relPath}: 「${state}」行必须包含 5 列（状态/触发条件/样本门槛/观察窗/复核要求）`);
+  return cells;
+}
+
+test("ac-race-thresholds 判定表四态齐全且阈值可解析、标注默认待校准", () => {
+  const block = thresholdBlock(read(MATRIX_TASK), MATRIX_TASK);
+  assert.match(block, /默认阈值/, "判定表必须标注默认阈值");
+  assert.match(block, /首个真实周期实测后校准/, "判定表必须标注可校准");
+
+  let numericGroups = 0;
+  for (const state of RACE_STATES) {
+    const cells = tableRow(block, state, MATRIX_TASK);
+    const trigger = cells[1].match(/-?\d+(?:\.\d+)?/g) ?? [];
+    assert.ok(trigger.length >= 2, `${state}: 触发条件至少要有 2 个数值阈值，实际 ${trigger.length}`);
+    const sampleGate = cells[2].match(/-?\d+(?:\.\d+)?/g) ?? [];
+    assert.ok(sampleGate.length >= 1, `${state}: 最小样本门槛必须含数值`);
+    assert.ok(cells[3].length > 0 && cells[4].length > 0, `${state}: 观察窗与复核要求不得为空`);
+    numericGroups += trigger.length;
+  }
+  assert.ok(numericGroups >= 4, `判定表应能正则解析出 ≥4 组数值阈值，实际 ${numericGroups}`);
+
+  const numbers = thresholdNumbers(block);
+  for (const expected of [0.5, 1.5, 2, 3, 4, 20]) {
+    assert.ok(numbers.includes(expected), `判定表缺少基线阈值 ${expected}`);
+  }
+});
+
+test("ac-rule-consistency growth 任务与两个 README 的阈值数值与 matrix-hq 完全一致", () => {
+  const canonical = thresholdNumbers(thresholdBlock(read(MATRIX_TASK), MATRIX_TASK));
+  assert.ok(canonical.length >= 4, `matrix-hq 阈值数值集合过小: ${canonical.join(",")}`);
+
+  for (const relPath of [GROWTH_TASK, MATRIX_README, GROWTH_README]) {
+    const block = thresholdBlock(read(relPath), relPath);
+    assert.deepEqual(thresholdNumbers(block), canonical, `${relPath}: 阈值数值集合与 matrix-hq 不一致`);
+    assert.match(block, /默认阈值/, `${relPath}: 阈值摘要必须标注默认阈值可校准`);
+  }
+
+  const growthBlock = thresholdBlock(read(GROWTH_TASK), GROWTH_TASK);
+  for (const state of RACE_STATES) {
+    tableRow(growthBlock, state, GROWTH_TASK);
+  }
+});
+
+test("ac-retro-archive growth 同时产出 digest 与 ISO 周归档，matrix-hq 读取 retros/", () => {
+  const retro = read(GROWTH_TASK);
+  assert.ok(retro.includes(RETRO_ARCHIVE_PATH), "growth 任务必须写明 retros/weekly-YYYY-Www.md 归档路径");
+  assert.ok(retro.includes("`digest.md`"), "growth 任务必须保留本周摘要 digest.md");
+  assert.match(retro, /ISO 周/, "growth 任务必须说明归档按 ISO 周命名");
+
+  const retrosDir = join(productDir, "projects", "growth", "retros");
+  assert.equal(existsSync(retrosDir), true, "缺少 growth/retros 归档目录");
+  assert.ok(listFiles(retrosDir).includes(".gitkeep"), "growth/retros 必须保留 .gitkeep");
+
+  const matrix = read(MATRIX_TASK);
+  assert.ok(matrix.includes(RETRO_ARCHIVE_PATH), "matrix-hq 任务必须读取 growth 的 retros/ 归档");
+  assert.ok(matrix.includes("growth/retros/"), "matrix-hq 任务必须指向 growth 的 retros/ 目录");
+});
+
+test("ac-no-fake-metrics 复盘文档不含伪指标，digest 交接必须同时给出归档路径", () => {
+  const reviewDocs = [MATRIX_TASK, GROWTH_TASK, MATRIX_README, GROWTH_README];
+  for (const relPath of reviewDocs) {
+    const text = read(relPath);
+    assert.doesNotMatch(
+      text,
+      /(阅读量|粉丝数|曝光量|转化率|爆款案例|点赞数)\s*[:：]?\s*\d/,
+      `${relPath}: 出现把具体指标当事实的伪数据`
+    );
+    assert.match(thresholdBlock(text, relPath), /默认阈值/, `${relPath}: 阈值必须以策略默认值呈现`);
+  }
+
+  for (const relPath of listFiles(companyDir)) {
+    if (!/\.(md|html)$/i.test(relPath)) continue;
+    if (!/\/(matrix-hq|growth)\//.test(`/${relPath}`)) continue;
+    const text = readFileSync(join(companyDir, relPath), "utf8");
+    if (!text.includes("digest.md")) continue;
+    assert.ok(
+      text.includes(RETRO_ARCHIVE_PATH),
+      `${relPath}: 复盘摘要交接必须同时提到 ${RETRO_ARCHIVE_PATH} 归档`
+    );
+  }
+});
