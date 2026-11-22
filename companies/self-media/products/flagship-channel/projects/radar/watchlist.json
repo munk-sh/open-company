@@ -1,0 +1,108 @@
+{
+  "profile": {
+    "niche": "待负责人在首轮对话中确认的垂直赛道",
+    "target_audience": "该赛道上正在寻找具体解法与真实经验的人",
+    "language_preference": "zh-CN"
+  },
+  "keywords": {
+    "boost": [
+      "agent",
+      "workflow",
+      "mcp",
+      "open-source",
+      "local-first",
+      "solo",
+      "monetize",
+      "automation",
+      "cursor",
+      "claude",
+      "工作流",
+      "自动化",
+      "提效",
+      "信息差",
+      "工具",
+      "教程",
+      "副业"
+    ],
+    "mute": [
+      "benchmark leaderboard",
+      "celebrity gossip",
+      "娱乐八卦",
+      "纯算力财报"
+    ]
+  },
+  "social_window": {
+    "active_hours_start": 8,
+    "active_hours_end": 22,
+    "cooldown_minutes": 210
+  },
+  "public_sources": [
+    {
+      "id": "hn-top",
+      "name": "Hacker News 高热讨论",
+      "type": "hn_top",
+      "min_score": 120,
+      "limit": 15,
+      "enabled": true
+    },
+    {
+      "id": "hn-show",
+      "name": "Show HN 新产品与开源首发",
+      "type": "hn_show",
+      "min_score": 40,
+      "limit": 10,
+      "enabled": true
+    },
+    {
+      "id": "github-trending-daily",
+      "name": "GitHub 今日飙升开源项目",
+      "type": "rss",
+      "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
+      "limit": 10,
+      "enabled": true
+    },
+    {
+      "id": "simon-willison",
+      "name": "Simon Willison's Weblog (AI 工程与工具实战风向标)",
+      "type": "rss",
+      "url": "https://simonwillison.net/atom/everything/",
+      "limit": 5,
+      "enabled": true
+    }
+  ],
+  "social_channels": [
+    {
+      "id": "x-twitter",
+      "platform": "X (Twitter)",
+      "enabled": true,
+      "entry_url": "https://x.com/home",
+      "search_queries": [
+        "(\"AI agent\" OR \"workflow\" OR \"MCP\") min_faves:100",
+        "\"build in public\" (revenue OR MRR OR launched) min_faves:50"
+      ],
+      "look_for": "海外野生高赞工作流、独立创作者晒出的真实转化小产品、正在发酵的新工具实测与争议"
+    },
+    {
+      "id": "xiaohongshu",
+      "platform": "小红书",
+      "enabled": true,
+      "entry_url": "https://www.xiaohongshu.com/explore",
+      "search_queries": [
+        "AI工作流",
+        "效率工具",
+        "副业"
+      ],
+      "look_for": "近 3 天互动率异常高的『低粉爆款』图文，评论区高频出现『求教程 / 怎么弄 / 什么软件』的真实需求；同时核验海外新热点在小红书是否尚属空白"
+    },
+    {
+      "id": "wechat-mp",
+      "platform": "微信公众号",
+      "enabled": false,
+      "entry_url": "https://mp.weixin.qq.com",
+      "search_queries": [
+        "该赛道关键词"
+      ],
+      "look_for": "同赛道头部账号的选题结构与深度长文节奏（默认关闭，需要时对负责人说一声即可开启）"
+    }
+  ]
+}

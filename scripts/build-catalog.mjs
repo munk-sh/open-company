@@ -39,30 +39,34 @@ const BILINGUAL_METADATA = {
       },
     },
   },
-  "one-person-company": {
+  "self-media": {
     name: {
-      zh: "一人公司 · 超级个体",
-      en: "One-Person Company",
+      zh: "自媒体矩阵",
+      en: "Self-Media Matrix",
     },
     description: {
-      zh: "一支替你运转「你自己」这家公司的 AI 幕僚班子：情报雷达盯风向、第二大脑攒认知、内容工坊做影响力、财富部门盯搞钱机会与账本、晨夕复盘管节奏与进化。直接跟公司负责人对话即可按需开关定制。",
-      en: "An AI team that runs your one-person company: Intel Radar for external signals, Second Brain for knowledge synthesis, Content Studio for multi-platform publishing, Wealth & Deals for revenue opportunities & ledger analysis, and Daily Patrol for morning briefings & nightly evolution.",
+      zh: "一套按「矩阵赛马」运营多账号自媒体的 AI 团队：顶层总控每周比较各频道真实转化，决定加注、冻结或淘汰，并把爆款结构沉淀为共享打法；内置首发样板频道 flagship-channel，自带零 Token 热点哨兵、选题工坊与频道复盘。",
+      en: "An AI team that runs a multi-account media matrix as a channel race: a top-level HQ compares real conversion each week, decides which channels to scale, freeze, or retire, and distills winning structures into shared playbooks. Ships with a flagship-channel starter product with a zero-token signal sentinel, topic studio, and weekly retros.",
     },
     opsHighlights: {
       zh: [
-        "radar：零 Token 预检 + 行业热点、舆情与信息差盯盘",
-        "brain：消化随手投喂的笔记、长文与录音，构建个人认知网",
-        "studio：把外部情报与个人观点裂变为多平台待发成稿并呈批",
-        "wealth：盯搞钱痛点、套利线索与收支数据算账",
-        "daily-patrol：早 08:00 一页纸拍板早报 + 晚 21:00 复盘进化",
+        "matrix-hq：每周日 20:00 汇总各频道增长复盘并给出赛马决策",
+        "radar：零 Token 公开源哨兵每小时扫描真实热点与跨网信息差",
+        "studio：每日 10:00 产出选题提案，拍板后生成多平台成品包",
+        "growth：每周日 19:00 用真实数据复盘频道方向",
       ],
       en: [
-        "radar: Zero-token preflight watch for industry signals & trends",
-        "brain: Second brain that digests notes, links & voice memos into reusable insights",
-        "studio: Multi-platform content production staged for one-click human approval",
-        "wealth: Opportunity hunting, deal evaluation & personal ledger analytics",
-        "daily-patrol: 08:00 executive morning brief & 21:00 nightly review",
+        "matrix-hq: Weekly Sunday 20:00 channel comparison and race decisions",
+        "radar: Zero-token hourly scan of public sources and cross-platform signal gaps",
+        "studio: 10:00 daily topic pitches, then multi-platform draft packages",
+        "growth: Sunday 19:00 channel retro backed by real data",
       ],
+    },
+    productSummaries: {
+      "flagship-channel": {
+        zh: "首发样板频道：从 Day-0 空态开始，含 radar 热点哨兵（每小时）、studio 每日选题与多平台成品包、growth 周度复盘，用真实数据验证方向是否值得加注。",
+        en: "Flagship starter channel: starts from an honest Day-0 empty state with an hourly radar sentinel, daily topic pitches and multi-platform draft packages, plus weekly growth retros to prove whether the direction deserves more investment.",
+      },
     },
   },
 };
@@ -88,12 +92,13 @@ function parseProductYaml(text) {
   const base = parseScalarYaml(text);
   const gitMatch = /\n\s+git:\s*([^\s#]+)/.exec(text);
   const branchMatch = /\n\s+branch:\s*([^\s#]+)/.exec(text);
+  const unquote = (val) => val.trim().replace(/^['"]|['"]$/g, "");
   return {
     id: base.id || "",
     title: base.title || base.id || "",
     lifecycle: base.lifecycle || "live",
-    git: gitMatch ? gitMatch[1].trim() : "",
-    branch: branchMatch ? branchMatch[1].trim() : "main",
+    git: gitMatch ? unquote(gitMatch[1]) : "",
+    branch: branchMatch ? unquote(branchMatch[1]) : "main",
   };
 }
 

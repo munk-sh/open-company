@@ -1,0 +1,10 @@
+spec: open-company/v0
+id: 8284ba1f-312b-4388-ba9d-e79bc96ccfd1
+name: 自媒体矩阵 (Self-Media Matrix)
+description: 一套按「矩阵赛马」方式运营多账号自媒体的 AI 团队：顶层总控按周比较各频道转化，把爆款结构沉淀为共享打法，持续孵化、冻结与淘汰频道；内置首发样板频道 flagship-channel，自带零 Token 热点哨兵、选题工坊与频道复盘。
+homepage: https://opencompany.run
+requires:
+  logins:
+    - xiaohongshu
+    - x
+    - wechat-mp

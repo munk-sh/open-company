@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "description": "Static build of catalog.json plus the company template contract test suite.",
+  "gates": [
+    {
+      "id": "build",
+      "cwd": ".",
+      "command": "node scripts/build-catalog.mjs"
+    },
+    {
+      "id": "test",
+      "cwd": ".",
+      "command": "node --test scripts/validate-company.test.mjs"
+    }
+  ]
+}

@@ -72,6 +72,18 @@ An AI team template that builds, tests, releases, and maintains open-source desk
 4. **Daily Scheduled Release & Replies (07:00)**: Cuts a release when new fixes land, then automatically replies to linked GitHub issues and closes them out.
 5. **Nightly Review (21:00)**: Audits daily progress across the team and writes newly learned lessons back into shared guidelines.
 
+### 2. [`companies/self-media`](./companies/self-media) — Self-Media Matrix
+
+An AI team template for running a multi-account media matrix as a channel race. A top-level `matrix-hq` compares each channel's real conversion every week, decides what to scale, freeze, or retire, and distills winning structures into shared playbooks. The bundled `flagship-channel` product starts from an honest Day-0 empty state with no fabricated posts or metrics.
+
+**How the agents divide and coordinate the work:**
+
+1. **Zero-Token Signal Sentinel (Hourly)**: `guards/radar-sentinel.mjs` pulls real public sources (Hacker News, GitHub Trending RSS, engineering blogs), dedupes them, and wakes an agent only when a new signal matches the channel's niche.
+2. **Daily Topic Pitches (10:00)**: Turns fresh radar signals into two concrete topic proposals with angles, platform fit, and source links—waiting for human approval before any full draft is written.
+3. **Multi-Platform Draft Packages (on demand)**: Produces a WeChat long-form article, Xiaohongshu image cards, and an X thread from one approved angle, all staged for human review.
+4. **Weekly Channel Retro (Sunday 19:00)**: Reviews real published content and platform data, then concludes whether the direction deserves more investment, should hold, or should freeze.
+5. **Matrix Race Review (Sunday 20:00)**: `matrix-hq` compares every channel's retro, makes the scale/hold/freeze/retire call, and writes validated winning structures into shared playbooks.
+
 ---
 
 ## How to Run in Munk AI

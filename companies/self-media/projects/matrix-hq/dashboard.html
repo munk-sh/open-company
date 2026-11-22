@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>自媒体矩阵 · 赛马看板</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f5f5f7;
+        --panel: #ffffff;
+        --text: #1d1d1f;
+        --muted: #6e6e73;
+        --line: #d2d2d7;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1c1c1e;
+          --panel: #2c2c2e;
+          --text: #f5f5f7;
+          --muted: #98989d;
+          --line: #3a3a3c;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 48px 24px;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      main { max-width: 760px; margin: 0 auto; }
+      h1 { margin: 0 0 8px; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+      p.lede { margin: 0 0 32px; color: var(--muted); }
+      section {
+        padding: 24px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        margin-bottom: 16px;
+      }
+      h2 { margin: 0 0 12px; font-size: 18px; font-weight: 600; }
+      ul { margin: 0; padding-left: 20px; color: var(--muted); }
+      li { margin: 4px 0; }
+      .empty {
+        margin: 0;
+        padding: 32px 24px;
+        text-align: center;
+        color: var(--muted);
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+      }
+      footer { margin-top: 24px; color: var(--muted); font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>自媒体矩阵 · 赛马看板</h1>
+      <p class="lede">只读看板。所有数字必须来自各频道复盘文件，没有真实数据时保持空态。</p>
+
+      <section>
+        <h2>频道表现</h2>
+        <p class="empty">暂无数据<br />首个频道完成周度复盘后，这里才会出现真实对比。</p>
+      </section>
+
+      <section>
+        <h2>数据来源</h2>
+        <ul>
+          <li>各频道 <code>growth/weekly-channel-retro</code> 的复盘结论</li>
+          <li>矩阵总控 <code>weekly-matrix-review</code> 的周度比较结果</li>
+        </ul>
+      </section>
+
+      <footer>空态是正常的起点。不提供刷新按钮，也不展示占位数字。</footer>
+    </main>
+  </body>
+</html>
