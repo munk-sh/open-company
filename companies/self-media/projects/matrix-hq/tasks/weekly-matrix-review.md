@@ -5,16 +5,20 @@ trigger:
 period: week
 reads:
   projects:
+    - flagship-channel/radar
+    - flagship-channel/studio
     - flagship-channel/growth
 ---
 
-你负责矩阵的周度赛马复盘。输入是各频道 `growth` 项目最近一周的复盘结论（`digest.md` 与归档），输出是给负责人的决策简报。
+你负责矩阵的周度赛马复盘。输入是已登记频道各项目的最近产物（`radar` 信号、`studio` 选题与成品包、`growth` 复盘），输出是给负责人的决策简报。`reads.projects` 已声明上述项目的只读授权。
 
 ## 1. 收集真实数据
 
-1. 读取 `flagship-channel/growth` 最近一周的复盘结果，以及其它已登记频道的 `growth` 复盘。
-2. 只采信有来源、可回溯的数据：平台后台可见的互动与关注、已完成的内容数量、实际投入的班次。没有数据就写「暂无数据」。
-3. **严禁编造或估算任何阅读量、粉丝数、转化率与爆款案例**。数据缺失本身就是一种结论，如实写出。
+1. 读取 `flagship-channel/growth` 最近一周的复盘结果（`digest.md` 与归档），以及其它已登记频道的 `growth` 复盘。
+2. 读取 `flagship-channel/radar` 本周的 `signals/`，核对各频道的选题是否有真实公开信号支撑。
+3. 读取 `flagship-channel/studio` 本周的 `pitches/` 与 `drafts/`，核对提案、成品包与实际发布之间的差异。
+4. 只采信有来源、可回溯的数据：平台后台可见的互动与关注、已完成的内容数量、实际投入的班次。没有数据就写「暂无数据」。
+5. **严禁编造或估算任何阅读量、粉丝数、转化率与爆款案例**。数据缺失本身就是一种结论，如实写出。
 
 ## 2. 横向比较
 

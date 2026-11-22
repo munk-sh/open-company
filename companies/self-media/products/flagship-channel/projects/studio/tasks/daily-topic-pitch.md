@@ -12,9 +12,9 @@ reads:
 
 ## 1. 开工必读
 
-1. 加载公司级技能 `brand-voice`，按频道 `../../AGENTS.md` 的人设与受众校准语气。
-2. 读取 `../radar/signals/` 最近 1–2 天的信号简报，筛出与赛道相关的条目。
-3. 读取频道 `code/pitches/`、`code/drafts/` 与 `code/published/` 的文件列表，避免与近期已提报或已发布的选题撞车。
+1. 按名称加载公司级技能 `brand-voice`，按产品 `../../AGENTS.md` 的人设与受众校准语气。
+2. 读取 `../radar/signals/` 下最近 1–2 天的信号简报（`reads.projects` 已声明只读授权），筛出与赛道相关的条目。
+3. 读取本项目 `pitches/`、`drafts/` 与 `published/` 的文件列表，避免与近期已提报或已发布的选题撞车。
 4. 若本场带 `brief`，优先围绕 `brief` 指定的方向做提案。
 
 ## 2. 产出 2 个选题提案
@@ -30,7 +30,7 @@ reads:
 
 ## 3. 落盘
 
-把提案写入 `../../code/pitches/YYYY-MM-DD.md`，并在 `digest.md` 汇总两条提案的标题与建议优先级，等待负责人拍板。
+把提案写入本项目工作目录下的 `pitches/YYYY-MM-DD.md`，并在 `digest.md` 汇总两条提案的标题与建议优先级，等待负责人拍板。
 
 ## 4. 诚实底线
 

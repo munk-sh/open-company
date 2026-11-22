@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { execFileSync, spawn } from "node:child_process";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { createServer } from "node:http";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -91,9 +93,9 @@ test("首发频道 Productfile 与产品目录契约正确", () => {
     "companies/self-media/products/flagship-channel/goal.md",
     "companies/self-media/products/flagship-channel/AGENTS.md",
     "companies/self-media/products/flagship-channel/code/README.md",
-    "companies/self-media/products/flagship-channel/code/pitches/.gitkeep",
-    "companies/self-media/products/flagship-channel/code/drafts/.gitkeep",
-    "companies/self-media/products/flagship-channel/code/published/.gitkeep",
+    "companies/self-media/products/flagship-channel/projects/studio/pitches/.gitkeep",
+    "companies/self-media/products/flagship-channel/projects/studio/drafts/.gitkeep",
+    "companies/self-media/products/flagship-channel/projects/studio/published/.gitkeep",
     "companies/self-media/products/flagship-channel/projects/radar/guards/radar-sentinel.mjs",
     "companies/self-media/products/flagship-channel/projects/radar/watchlist.json",
     "companies/self-media/products/flagship-channel/projects/studio/tasks/daily-topic-pitch.md",
@@ -104,7 +106,7 @@ test("首发频道 Productfile 与产品目录契约正确", () => {
   }
 
   const contentFiles = listFiles(join(productDir, "code")).filter((name) => !name.endsWith(".gitkeep"));
-  assert.deepEqual(contentFiles, ["README.md"], "channel content library must start empty (only README.md)");
+  assert.deepEqual(contentFiles, ["README.md"], "product source repo must start empty (only README.md)");
 });
 
 test("所有任务 frontmatter 满足 title / schedule+period / guard 契约", () => {
@@ -211,4 +213,185 @@ test("catalog.json 连续两次构建输出稳定", () => {
   const first = read("catalog.json");
   execFileSync(process.execPath, ["scripts/build-catalog.mjs"], { cwd: repoRoot, stdio: "pipe" });
   assert.equal(read("catalog.json"), first, "catalog.json must be byte-stable across builds");
+});
+
+function readsProjects(fm) {
+  const block = /^reads:\n {2}projects:\n((?: {4}- \S+\n?)+)/m.exec(fm);
+  assert.ok(block, "frontmatter must declare reads.projects");
+  const list = block[1]
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => line.replace(/^- /, ""));
+  assert.ok(list.length > 0, "reads.projects must not be empty");
+  return list;
+}
+
+test("ac-1 项目产物路径落在各自项目工作目录，技能按名称加载", () => {
+  for (const name of listFiles(companyDir)) {
+    if (/\.(png|jpg|jpeg|gif|webp|ico|woff2?|ttf)$/i.test(name)) continue;
+    const text = readFileSync(join(companyDir, name), "utf8");
+    assert.equal(text.includes("../../code"), false, `${name}: 不得引用导入后越权的 ../../code 路径`);
+    assert.equal(text.includes("../../../skills"), false, `${name}: 技能必须按名称加载，不得引用 ../../../skills 相对路径`);
+  }
+
+  for (const name of listFiles(join(productDir, "projects"))) {
+    if (!name.endsWith(".md")) continue;
+    const text = readFileSync(join(productDir, "projects", name), "utf8");
+    assert.equal(/SKILL\.md/.test(text), false, `projects/${name}: 技能不得以文件路径引用`);
+  }
+
+  for (const dirName of ["pitches", "drafts", "published"]) {
+    assert.equal(
+      existsSync(join(productDir, "projects", "studio", dirName)),
+      true,
+      `missing studio/${dirName} writable directory`
+    );
+  }
+
+  const dailyPitch = read("companies/self-media/products/flagship-channel/projects/studio/tasks/daily-topic-pitch.md");
+  assert.match(dailyPitch, /pitches\/YYYY-MM-DD\.md/);
+  assert.match(dailyPitch, /^ {4}- flagship-channel\/radar$/m);
+
+  const draft = read("companies/self-media/products/flagship-channel/projects/studio/tasks/multi-platform-draft.md");
+  assert.match(draft, /drafts\/YYYY-MM-DD-<slug>\//);
+
+  const retro = read("companies/self-media/products/flagship-channel/projects/growth/tasks/weekly-channel-retro.md");
+  assert.match(retro, /\.\.\/studio\/published\//);
+  assert.match(retro, /\.\.\/radar\/signals\//);
+  for (const name of ["daily-topic-pitch.md", "multi-platform-draft.md"]) {
+    const text = read(`companies/self-media/products/flagship-channel/projects/studio/tasks/${name}`);
+    assert.equal(text.includes("code/"), false, `studio/${name}: 产出不得写产品 code/ 目录`);
+  }
+  assert.equal(retro.includes("code/"), false, "growth 复盘不得引用失效的 code/ 目录");
+});
+
+test("ac-2 跨项目读取上游产物的任务显式声明 reads.projects", () => {
+  const expectations = {
+    "companies/self-media/products/flagship-channel/projects/studio/tasks/daily-topic-pitch.md": ["flagship-channel/radar"],
+    "companies/self-media/products/flagship-channel/projects/studio/tasks/multi-platform-draft.md": ["flagship-channel/radar"],
+    "companies/self-media/products/flagship-channel/projects/growth/tasks/weekly-channel-retro.md": [
+      "flagship-channel/radar",
+      "flagship-channel/studio",
+    ],
+    "companies/self-media/projects/matrix-hq/tasks/weekly-matrix-review.md": [
+      "flagship-channel/radar",
+      "flagship-channel/studio",
+      "flagship-channel/growth",
+    ],
+  };
+
+  for (const [relPath, expected] of Object.entries(expectations)) {
+    assert.deepEqual(readsProjects(frontmatter(read(relPath))), expected, `${relPath}: reads.projects mismatch`);
+  }
+});
+
+function guardFixture(watchlist) {
+  const projectDir = join(mkdtempSync(join(tmpdir(), "radar-sentinel-")), "project");
+  mkdirSync(join(projectDir, "guards"), { recursive: true });
+  copyFileSync(
+    join(productDir, "projects", "radar", "guards", "radar-sentinel.mjs"),
+    join(projectDir, "guards", "radar-sentinel.mjs")
+  );
+  if (watchlist !== undefined) {
+    writeFileSync(
+      join(projectDir, "watchlist.json"),
+      typeof watchlist === "string" ? watchlist : JSON.stringify(watchlist, null, 2)
+    );
+  }
+  return { projectDir, guardPath: join(projectDir, "guards", "radar-sentinel.mjs") };
+}
+
+function runGuard(guardPath) {
+  return new Promise((resolvePromise, rejectPromise) => {
+    const child = spawn(process.execPath, [guardPath], { stdio: ["ignore", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
+    const timer = setTimeout(() => {
+      child.kill("SIGKILL");
+      rejectPromise(new Error("radar-sentinel timed out"));
+    }, 20000);
+    child.stdout.on("data", (chunk) => (stdout += chunk));
+    child.stderr.on("data", (chunk) => (stderr += chunk));
+    child.on("error", (error) => {
+      clearTimeout(timer);
+      rejectPromise(error);
+    });
+    child.on("close", (status) => {
+      clearTimeout(timer);
+      resolvePromise({ status, stdout, stderr });
+    });
+  });
+}
+
+const RSS_FEED = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>fixture</title>
+<item><title>A new agent workflow</title><link>https://example.com/agent-workflow</link>
+<guid>fixture-item-1</guid><description>local first agent tooling</description>
+<pubDate>Sun, 22 Nov 2026 09:00:00 GMT</pubDate></item>
+</channel></rss>`;
+
+function rssWatchlist(url) {
+  return {
+    profile: { niche: "测试赛道" },
+    keywords: { boost: ["agent"], mute: [] },
+    public_sources: [{ id: "fixture", name: "fixture", type: "rss", url, limit: 5, enabled: true }],
+  };
+}
+
+async function withRssServer(fn) {
+  const server = createServer((_req, res) => {
+    res.writeHead(200, { "content-type": "application/rss+xml; charset=utf-8" });
+    res.end(RSS_FEED);
+  });
+  await new Promise((resolveListen) => server.listen(0, "127.0.0.1", resolveListen));
+  const { port } = server.address();
+  try {
+    return await fn(`http://127.0.0.1:${port}/feed.xml`);
+  } finally {
+    await new Promise((resolveClose) => server.close(resolveClose));
+  }
+}
+
+test("ac-3 雷达守卫：配置缺失/损坏、全部源失败、未捕获异常均以 2 退出并写 stderr", async () => {
+  const missing = await runGuard(guardFixture(undefined).guardPath);
+  assert.equal(missing.status, 2, "missing watchlist.json must exit 2");
+  assert.match(missing.stderr, /watchlist\.json/);
+
+  const corrupt = await runGuard(guardFixture("{ not valid json").guardPath);
+  assert.equal(corrupt.status, 2, "corrupt watchlist.json must exit 2");
+  assert.match(corrupt.stderr, /合法 JSON/);
+
+  const allFailed = await runGuard(guardFixture(rssWatchlist("http://127.0.0.1:1/feed.xml")).guardPath);
+  assert.equal(allFailed.status, 2, "all sources failing must exit 2");
+  assert.match(allFailed.stderr, /全部 1 个外部源抓取失败/);
+  assert.match(allFailed.stderr, /fixture/);
+
+  const crashed = guardFixture(await withRssServer((url) => Promise.resolve(rssWatchlist(url))));
+  writeFileSync(join(crashed.projectDir, ".state"), "not a directory");
+  const uncaught = await runGuard(crashed.guardPath);
+  assert.equal(uncaught.status, 2, "uncaught exception must exit 2");
+  assert.match(uncaught.stderr, /未捕获异常/);
+});
+
+test("ac-3 雷达守卫：至少一个源成功且无新信号退出 1，发现新信号落盘并退出 0", async () => {
+  await withRssServer(async (url) => {
+    const skip = guardFixture(rssWatchlist(url));
+    mkdirSync(join(skip.projectDir, ".state"), { recursive: true });
+    writeFileSync(
+      join(skip.projectDir, ".state", "seen-items.json"),
+      JSON.stringify({ ids: ["rss:fixture:fixture-item-1"] })
+    );
+    const skipped = await runGuard(skip.guardPath);
+    assert.equal(skipped.status, 1, "successful sources with no new items must exit 1");
+    assert.equal(existsSync(join(skip.projectDir, ".state", "pending-signals.json")), false);
+
+    const trigger = guardFixture(rssWatchlist(url));
+    const triggered = await runGuard(trigger.guardPath);
+    assert.equal(triggered.status, 0, "new items must exit 0");
+    const pending = JSON.parse(readFileSync(join(trigger.projectDir, ".state", "pending-signals.json"), "utf8"));
+    assert.equal(pending.totalNewCount, 1);
+    assert.equal(pending.items[0].uid, "rss:fixture:fixture-item-1");
+    assert.deepEqual(pending.items[0].matchedBoost, ["agent"]);
+  });
 });
