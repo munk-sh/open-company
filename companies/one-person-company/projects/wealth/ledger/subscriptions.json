@@ -1,0 +1,53 @@
+{
+  "updatedAt": "2026-11-04",
+  "items": [
+    {
+      "id": "sub-claude-openrouter",
+      "name": "Claude Max & OpenRouter 主力算力池",
+      "category": "cost:ai_infra",
+      "billingCycle": "monthly",
+      "monthlyCostCNY": 1450,
+      "nextBillingDate": "2026-11-15",
+      "usageLevel": "high",
+      "vampireRisk": false,
+      "autoRenewAlert": false,
+      "notes": "全公司 5 大部门 Agent 日常运转核心底座，ROI 极高"
+    },
+    {
+      "id": "sub-midjourney-pro",
+      "name": "Midjourney Pro Plan ($60/mo)",
+      "category": "cost:saas_sub",
+      "billingCycle": "monthly",
+      "monthlyCostCNY": 430,
+      "nextBillingDate": "2026-11-07",
+      "usageLevel": "low",
+      "vampireRisk": true,
+      "autoRenewAlert": true,
+      "notes": "近 30 天仅使用 2 次（studio 视频与封面已转向 SVG/GSAP 与按量 API），建议在 11-07 自动扣费前取消或降级"
+    },
+    {
+      "id": "sub-seo-tool",
+      "name": "某海外 SEO 关键词分析工具年费折算",
+      "category": "cost:saas_sub",
+      "billingCycle": "monthly",
+      "monthlyCostCNY": 710,
+      "nextBillingDate": "2026-11-08",
+      "usageLevel": "low",
+      "vampireRisk": true,
+      "autoRenewAlert": true,
+      "notes": "radar 部门已用零成本 RSS + 社媒守卫替代，属于典型吸血鬼订阅，建议立即停用续费"
+    },
+    {
+      "id": "sub-cloud-infra",
+      "name": "Cloudflare / Vercel / 域名与备份存储",
+      "category": "cost:saas_sub",
+      "billingCycle": "monthly",
+      "monthlyCostCNY": 260,
+      "nextBillingDate": "2026-11-22",
+      "usageLevel": "high",
+      "vampireRisk": false,
+      "autoRenewAlert": false,
+      "notes": "基础数字资产托管底座"
+    }
+  ]
+}

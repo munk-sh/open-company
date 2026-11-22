@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>一人公司 · 经营驾驶舱与晨夕节律</title>
+  <style>
+    :root {
+      --bg-canvas: #0a0c10;
+      --bg-surface: #11151e;
+      --bg-elevated: #171c28;
+      --bg-hover: #1e2536;
+      --border-subtle: #1f2737;
+      --border-strong: #2d384f;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-emerald: #10b981;
+      --accent-emerald-bg: rgba(16, 185, 129, 0.12);
+      --accent-amber: #f59e0b;
+      --accent-amber-bg: rgba(245, 158, 11, 0.12);
+      --accent-rose: #f43f5e;
+      --accent-rose-bg: rgba(244, 63, 94, 0.12);
+      --accent-indigo: #6366f1;
+      --accent-indigo-bg: rgba(99, 102, 241, 0.14);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-bg: rgba(6, 182, 212, 0.12);
+      --radius: 10px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Inter", system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas); color: var(--text-primary); font-family: var(--font-sans);
+      font-size: 13px; line-height: 1.5; padding: 18px 20px 32px; -webkit-font-smoothing: antialiased;
+    }
+    .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px;
+    }
+    .topbar-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .topbar-title h1 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+      border-radius: 999px; font-size: 11px; font-weight: 500; border: 1px solid transparent;
+    }
+    .badge--emerald { background: var(--accent-emerald-bg); color: #34d399; border-color: rgba(16,185,129,0.28); }
+    .badge--amber { background: var(--accent-amber-bg); color: #fbbf24; border-color: rgba(245,158,11,0.28); }
+    .badge--rose { background: var(--accent-rose-bg); color: #fb7185; border-color: rgba(244,63,94,0.28); }
+    .badge--indigo { background: var(--accent-indigo-bg); color: #818cf8; border-color: rgba(99,102,241,0.28); }
+    .badge--cyan { background: var(--accent-cyan-bg); color: #22d3ee; border-color: rgba(6,182,212,0.28); }
+
+    .quick-links { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip-btn {
+      background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 4px 10px; font-size: 11.5px; cursor: pointer; transition: all 0.15s ease;
+      display: inline-flex; align-items: center; gap: 4px; text-decoration: none;
+    }
+    .chip-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-strong); }
+
+    /* Rhythm Banner */
+    .rhythm-banner {
+      background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.06) 100%);
+      border: 1px solid rgba(99,102,241,0.25); border-radius: var(--radius);
+      padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; flex-wrap: wrap;
+    }
+    .rhythm-info { display: flex; align-items: center; gap: 12px; }
+    .rhythm-icon { font-size: 24px; line-height: 1; }
+    .rhythm-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .rhythm-desc { font-size: 12px; color: var(--text-secondary); }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 16px;
+    }
+    .kpi-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius);
+      padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; transition: border-color 0.15s;
+    }
+    .kpi-card:hover { border-color: var(--border-strong); }
+    .kpi-label { color: var(--text-secondary); font-size: 11.5px; display: flex; justify-content: space-between; }
+    .kpi-val { font-size: 20px; font-weight: 700; display: flex; align-items: baseline; gap: 6px; }
+    .kpi-sub { color: var(--text-muted); font-size: 11px; display: flex; justify-content: space-between; }
+
+    /* MIT Section */
+    .panel {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius);
+      padding: 14px 16px; margin-bottom: 16px;
+    }
+    .panel-head {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+      gap: 8px; flex-wrap: wrap;
+    }
+    .panel-title { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
+    .mit-list { display: flex; flex-direction: column; gap: 8px; }
+    .mit-item {
+      background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;
+      padding: 12px 14px; display: flex; align-items: flex-start; gap: 12px; transition: all 0.15s ease;
+    }
+    .mit-item:hover { border-color: var(--border-strong); }
+    .mit-item.done { opacity: 0.75; }
+    .mit-item.done .mit-text { text-decoration: line-through; color: var(--text-secondary); }
+    .mit-checkbox {
+      margin-top: 2px; width: 17px; height: 17px; accent-color: var(--accent-emerald); cursor: pointer;
+    }
+    .mit-content { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .mit-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .mit-priority { font-family: var(--font-mono); font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 4px; }
+    .mit-priority--p0 { background: var(--accent-rose-bg); color: #fb7185; }
+    .mit-priority--p1 { background: var(--accent-amber-bg); color: #fbbf24; }
+    .mit-dept { font-size: 11px; color: var(--text-secondary); }
+    .mit-text { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .mit-notes { font-size: 11.5px; color: var(--text-muted); }
+    .mit-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 10px; }
+
+    /* Department Matrix Grid */
+    .dept-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 16px;
+    }
+    .dept-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius);
+      padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; transition: border-color 0.15s;
+    }
+    .dept-card:hover { border-color: var(--border-strong); }
+    .dept-head { display: flex; justify-content: space-between; align-items: center; }
+    .dept-title { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .dept-metrics { display: flex; gap: 16px; padding: 6px 0; border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); }
+    .dept-metric-item { display: flex; flex-direction: column; gap: 2px; }
+    .dept-metric-label { font-size: 10.5px; color: var(--text-muted); }
+    .dept-metric-val { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .dept-snippet { font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; }
+
+    /* Tabs */
+    .tabs {
+      display: flex; gap: 6px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px; overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent; color: var(--text-secondary); border: none; border-bottom: 2px solid transparent;
+      padding: 8px 14px; font-size: 12.5px; font-weight: 500; cursor: pointer; white-space: nowrap;
+    }
+    .tab-btn.active { color: var(--text-primary); border-bottom-color: var(--accent-indigo); background: rgba(99,102,241,0.06); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Markdown Reader Styling */
+    .doc-viewer {
+      background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius);
+      padding: 18px 20px; font-size: 12.5px; line-height: 1.6; color: #cbd5e1;
+    }
+    .doc-viewer h1, .doc-viewer h2, .doc-viewer h3 { color: var(--text-primary); margin-top: 14px; margin-bottom: 8px; font-weight: 600; }
+    .doc-viewer h1 { font-size: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; margin-top: 0; }
+    .doc-viewer h2 { font-size: 14px; }
+    .doc-viewer h3 { font-size: 13px; }
+    .doc-viewer blockquote {
+      border-left: 3px solid var(--accent-indigo); padding-left: 10px; margin: 10px 0; color: #94a3b8; background: rgba(99,102,241,0.05); padding: 8px 12px; border-radius: 4px;
+    }
+    .doc-viewer ul { padding-left: 20px; margin: 8px 0; }
+    .doc-viewer li { margin-bottom: 4px; }
+    .doc-viewer code { font-family: var(--font-mono); background: var(--bg-hover); padding: 2px 6px; border-radius: 4px; font-size: 11.5px; }
+
+    /* Rules Table */
+    .rule-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .rule-table th, .rule-table td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+    .rule-table th { color: var(--text-muted); font-size: 11px; font-weight: 500; text-transform: uppercase; }
+    .rule-table tr:hover td { background: var(--bg-hover); }
+
+    .toast {
+      position: fixed; bottom: 20px; right: 20px; background: var(--bg-elevated); border: 1px solid var(--border-strong);
+      color: var(--text-primary); padding: 10px 16px; border-radius: 8px; font-size: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: none; z-index: 100;
+    }
+  </style>
+<!-- MUNK_DASHBOARD_DATA_START --><script id="munk-dashboard-data">window.__DASHBOARD_DATA__ = {"generatedAt":"2026-11-16T03:27:24.953Z","today":"2026-11-04","rhythm":{"phase":"day_execution","label":"🚀 白天协同作战","desc":"静默推进，各部门按任务钟自主运转，守护无被打扰心流"},"company":{"name":"一人公司 · 超级个体","enName":"One-Person Company","owner":"CEO (Human) + Munk AI","status":"🟢 稳健运转中"},"mits":{"date":"2026-11-04","mits":[{"id":"MIT-20261104-01","department":"wealth","departmentName":"💰 财富与搞钱","title":"推进并发送 Cloudflare Workers 迁移咨询方案 (¥15,000 报价与 SOW)","status":"done","priority":"P0","timeEstimateMinutes":45,"completedAt":"2026-11-04T14:30:00+08:00","notes":"已基于 wealth/deals-and-offers.md 完成方案与估价，客户已确认查收","targetFile":"projects/wealth/deals-and-offers.md"},{"id":"MIT-20261104-02","department":"studio","departmentName":"🎨 内容工坊","title":"审阅并一键发布《为什么本地浏览器 Agent 正在替代 80% 的套壳 SaaS》","status":"done","priority":"P0","timeEstimateMinutes":30,"completedAt":"2026-11-04T17:15:00+08:00","notes":"公众号与 X 双版本已发布，引发 3 条高质量读者私信咨询","targetFile":"projects/studio/drafts/2026-11-03-local-browser-agent-vs-saas.md"},{"id":"MIT-20261104-03","department":"radar","departmentName":"📡 情报雷达","title":"针对 DeepSeek-V3 本地量化服务线索做第二轮竞品拆解与可行性测试","status":"in_progress","priority":"P1","timeEstimateMinutes":60,"completedAt":null,"notes":"已在 radar/signals/2026-11-04.md 标记，正在验证 Ollama 与 vLLM 显存占用","targetFile":"projects/radar/signals/2026-11-04.md"}],"stats":{"total":3,"done":2,"in_progress":1,"blocked":0,"completionRatePct":67}},"departments":{"radar":{"status":"healthy","name":"📡 情报雷达","signalsCount":5,"highImpactCount":1,"latestSignal":{"id":"SIG-20261104-01","tier":"S","source":"Show HN / GitHub Trending","title":"Browser-Use Local MCP 轻量级无头编排器 24h 暴涨 1,800 Stars","url":"https://news.ycombinator.com/","whatHappened":"海外开发者发布基于本地已登录浏览器 Profile 的超薄自动化协议，评论区大量独立开发者讨论如何用它替代昂贵的 SaaS API 连接器。","whyItMatters":"直接印证『一人公司无需购买企业级 SaaS API，复用个人浏览器登录态即可打通经营后台』的趋势，且国内社媒目前仅有个别搬运标题，尚无实操拆解。","downstreamTarget":"studio + brain","actionProposal":"已推送至 brain 生成认知素材，建议 studio 制作一期《别再买 $99/月 的连接器了：本地浏览器 Agent 实战》图文与 60s 动画短片。","detailPath":"signals/2026-11-04.md"}},"brain":{"status":"healthy","name":"🧠 第二大脑","sparksCount":2,"topicsCount":1,"weeklyPrinciple":"你负责拍板，让幕僚班子把脏活累活做完——一人公司不是一个人干十个人的苦力，而是一个人指挥一支全天候运转的队伍。"},"studio":{"status":"healthy","name":"🎨 内容工坊","draftsCount":3,"readyCount":1,"publishedCount":1,"latestReady":{"slug":"2026-11-03-local-browser-agent-vs-saas","path":"drafts/2026-11-03-local-browser-agent-vs-saas.md","title":"我把一年 ¥8,500 的 SaaS 账单砍到了 0","pillar":"P1","channels":["wechat","xiaohongshu"],"status":"review","date":"2026-11-03","wordCount":3200,"metrics":null}},"wealth":{"status":"healthy","name":"💰 财富与搞钱","netWorthCNY":1285000,"runwayMonths":35.2,"monthNetCashflowCNY":36040,"pendingArCNY":12500,"activePipelineValueCNY":52900}},"rules":{"mergedCount":2,"proposedCount":2,"totalCount":4,"items":[{"code":"RULE-MERGED-001","title":"Wealth 咨询报价硬闸","department":"wealth","status":"MERGED","summary":"**部门**：`wealth`"},{"code":"RULE-MERGED-002","title":"Radar 零 Token 预检降噪","department":"radar","status":"MERGED","summary":"**部门**：`radar`"},{"code":"RULE-EVO-20261104-01","title":"Studio 开头禁止“宏大废话”","department":"studio","status":"PROPOSED","summary":"**部门**：`studio`"},{"code":"RULE-EVO-20261102-01","title":"Brain 火花归档必须附带触发源","department":"brain","status":"PROPOSED","summary":"**部门**：`brain`"}]},"archives":{"briefs":[{"date":"2026-11-04","file":"briefs/2026-11-04.md","isToday":true}],"reviews":[{"date":"2026-11-04","file":"reviews/2026-11-04.md","isToday":true},{"date":"2026-11-03","file":"reviews/2026-11-03.md","isToday":false}],"todayBrief":{"exists":true,"raw":"# 🌅 晨会拍板简报 · 2026-11-04\n\n> **核心经营基调**：现金流极其健康（Runway 28.5m），今天核心任务是完成 ¥15,000 咨询方案交付与《本地浏览器 Agent》高质量长文发布。\n\n---\n\n## 🎯 今日 3 大必赢战役 (MITs)\n\n1. [x] **MIT 1（搞钱 / Wealth）**：推进并发送 Cloudflare Workers 迁移咨询方案 (¥15,000 报价与 SOW)\n   - 目标：锁定预付款 50%，明确 3 天交付边界。\n2. [x] **MIT 2（影响力 / Studio）**：审阅并一键发布《为什么本地浏览器 Agent 正在替代 80% 的套壳 SaaS》\n   - 目标：公众号与 X 双发，同步引流至个人咨询与开源主页。\n3. [ ] **MIT 3（认知 / Radar）**：针对 DeepSeek-V3 本地量化服务线索做第二轮竞品拆解与可行性测试\n   - 目标：评估 4-bit 量化在 Mac Studio 上的吞吐，输出可行性备忘录。\n\n---\n\n## 📡 部门动态速览\n\n- **📡 情报雷达 (Radar)**：\n  - 抓取到 2 条高价值信号：DeepSeek-V3 本地量化服务方案爆发、某头部出海小工具月度收入榜单。\n  - 建议跟进低显存部署方案，为后续咨询客户做方案储备。\n- **🧠 第二大脑 (Brain)**：\n  - 昨日消化 3 条随手投喂火花，重点沉淀「本地优先架构的心智护城河」。\n  - 本周核心心法：*“真正的护城河不是模型参数，而是用户本地数据主权与物理执行权限。”*\n- **🎨 内容工坊 (Studio)**：\n  - 柱状结构健康：40% 深度技术 / 40% 商业认知 / 20% 个体实战。\n  - 今日草稿已通过质量自检，等待人类最后扫一眼即可发布。\n- **💰 财富与安全 (Wealth)**：\n  - 净资产：¥1,032,500；现金与固收占 30.5%（处于最优容差内）。\n  - 安全跑道：**28.5 个月**（远高于 24m 红线）。\n  - 应收账款：1 笔 ¥12,000 待回款（账龄 4 天，正常周期）。\n\n---\n\n## 🚨 今日待拍板决策 (Decisions Needed)\n\n1. **Studio 成稿批准**：请在 Studio 看板确认《本地浏览器 Agent》排版与发文时间（建议上午 11:30 发布）。\n2. **商单发函确认**：咨询方案中已附加 12% 税金准备金（约 ¥1,800）与阶梯收款条款，请确认是否直接发送。\n"},"todayReview":{"exists":true,"raw":"# 🌙 晚间复盘与进化 · 2026-11-04\n\n> **本日总结**：今日 3 项 MIT 达成 2 项，1 项跨夜推进；内容已成功发布并带来 3 个高意向咨询潜在客户；提炼 1 条 Studio 负向开篇规则。\n\n---\n\n## 🎯 今日 MIT 完成审计\n\n- [x] **MIT 1（搞钱 / Wealth）**：Cloudflare Workers 迁移咨询方案已发出（客户已确认收到并同意预付款 ¥7,500）。\n- [x] **MIT 2（影响力 / Studio）**：已审阅并发布《为什么本地浏览器 Agent 正在替代 80% 的套壳 SaaS》（公众号完读率达 68%）。\n- [ ] **MIT 3（认知 / Radar）**：DeepSeek-V3 本地量化服务线索竞品拆解（进行中，已完成 75%，预计明天上午输出完整报告）。\n\n---\n\n## 🔍 今日踩坑与反思\n\n- **Studio 开篇 AI 味过重**：初稿开头第一句为“在当今快节奏的世界里，AI 技术正如火如荼...”，人类批注“把第一段全删掉直接看代码”。必须在 prompt 中作为负向禁词严格禁止。\n\n---\n\n## 🧬 规则沉淀建议\n\n- **提议规则**：`RULE-EVO-20261104-01` · 所有文章与短文开头第一句禁止使用任何宏大背景式陈述，必须从具体的痛点场景或尖锐的数据结论直接切入。\n- **状态**：`PROPOSED`（进入 3 天实战检验）\n"}}};</script><!-- MUNK_DASHBOARD_DATA_END -->
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-title">
+      <h1>一人公司 · 经营驾驶舱 (Executive Cockpit)</h1>
+      <span class="badge badge--emerald" id="status-badge">🟢 稳健运转中</span>
+      <span class="badge badge--indigo" id="date-badge">2026-11-04</span>
+    </div>
+    <div class="quick-links">
+      <button class="chip-btn" onclick="jumpToDepartment('radar')">📡 前往雷达</button>
+      <button class="chip-btn" onclick="jumpToDepartment('brain')">🧠 前往第二大脑</button>
+      <button class="chip-btn" onclick="jumpToDepartment('studio')">🎨 前往内容工坊</button>
+      <button class="chip-btn" onclick="jumpToDepartment('wealth')">💰 前往财富看板</button>
+      <button class="chip-btn" onclick="refreshPatrol()">🔄 刷新全盘</button>
+    </div>
+  </div>
+
+  <!-- Rhythm Banner -->
+  <div class="rhythm-banner">
+    <div class="rhythm-info">
+      <span class="rhythm-icon" id="rhythm-icon">🚀</span>
+      <div>
+        <div class="rhythm-title" id="rhythm-title">白天协同作战 (Day Execution)</div>
+        <div class="rhythm-desc" id="rhythm-desc">各部门静默推进，按任务钟自主运转，守护无被打扰的心流状态</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="chip-btn" onclick="switchTab('brief')">🌅 查看今日晨报</button>
+      <button class="chip-btn" onclick="switchTab('review')">🌙 查看晚间复盘</button>
+    </div>
+  </div>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card" onclick="switchTab('brief')">
+      <div class="kpi-label"><span>今日 MIT 达成率</span><span>🎯</span></div>
+      <div class="kpi-val"><span class="num" id="kpi-mit-rate">67%</span><span style="font-size:12px; color:var(--text-secondary);" id="kpi-mit-fraction">(2/3)</span></div>
+      <div class="kpi-sub"><span>P0 必赢战役推进中</span><span style="color:#34d399;">进行顺畅</span></div>
+    </div>
+    <div class="kpi-card" onclick="jumpToDepartment('radar')">
+      <div class="kpi-label"><span>雷达高优情报</span><span>📡</span></div>
+      <div class="kpi-val"><span class="num" id="kpi-radar-signals">2</span><span style="font-size:12px; color:var(--text-secondary);">条新信号</span></div>
+      <div class="kpi-sub"><span>高价值套利/竞品线索</span><span style="color:#818cf8;">1 条高优</span></div>
+    </div>
+    <div class="kpi-card" onclick="jumpToDepartment('studio')">
+      <div class="kpi-label"><span>内容待发管线</span><span>🎨</span></div>
+      <div class="kpi-val"><span class="num" id="kpi-studio-ready">1</span><span style="font-size:12px; color:var(--text-secondary);">篇待发</span></div>
+      <div class="kpi-sub"><span>草稿 2 篇 / 已发 8 篇</span><span style="color:#fbbf24;">双柱均衡</span></div>
+    </div>
+    <div class="kpi-card" onclick="jumpToDepartment('wealth')">
+      <div class="kpi-label"><span>财富安全边际</span><span>💰</span></div>
+      <div class="kpi-val"><span class="num" id="kpi-wealth-runway">28.5</span><span style="font-size:12px; color:var(--text-secondary);">个月</span></div>
+      <div class="kpi-sub"><span>净资产 ¥1,032,500</span><span style="color:#34d399;">高于24m</span></div>
+    </div>
+    <div class="kpi-card" onclick="switchTab('rules')">
+      <div class="kpi-label"><span>规则自进化库</span><span>🧬</span></div>
+      <div class="kpi-val"><span class="num" id="kpi-rules-count">4</span><span style="font-size:12px; color:var(--text-secondary);">条准则</span></div>
+      <div class="kpi-sub"><span>2 项已固化 / 2 项候选</span><span style="color:#818cf8;">持续蒸馏</span></div>
+    </div>
+  </div>
+
+  <!-- Today's MITs Section -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title">
+        <span>🎯 今日 3 大必赢战役 (Today's Most Important Tasks)</span>
+        <span class="badge badge--indigo">少即是多 · 每日上限 3 项</span>
+      </div>
+      <div style="font-size:11.5px; color:var(--text-muted);">点击复选框可标记完成</div>
+    </div>
+    <div class="mit-list" id="mit-container">
+      <!-- MIT Cards rendered by JS -->
+    </div>
+  </div>
+
+  <!-- Five Departments Matrix -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title">
+        <span>🌐 五大部门实时全景矩阵 (Five-Department Radar)</span>
+        <span class="badge badge--emerald">全链路协同</span>
+      </div>
+      <span style="font-size:11px; color:var(--text-muted);">点击各卡片直达对应部门独立看板</span>
+    </div>
+    <div class="dept-grid" id="dept-grid">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- Tabs for Document Viewing -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-btn-brief" onclick="switchTab('brief')">🌅 今日晨会简报</button>
+    <button class="tab-btn" id="tab-btn-review" onclick="switchTab('review')">🌙 晚间复盘与进化</button>
+    <button class="tab-btn" id="tab-btn-rules" onclick="switchTab('rules')">🧬 规则进化库 (AGENTS.md)</button>
+    <button class="tab-btn" id="tab-btn-archive" onclick="switchTab('archive')">🗂️ 晨夕历史档案</button>
+  </div>
+
+  <!-- Tab 1: Brief -->
+  <div class="tab-pane active" id="tab-pane-brief">
+    <div class="doc-viewer" id="brief-viewer">
+      <!-- Brief rendered by markdown parser -->
+    </div>
+  </div>
+
+  <!-- Tab 2: Review -->
+  <div class="tab-pane" id="tab-pane-review">
+    <div class="doc-viewer" id="review-viewer">
+      <!-- Review rendered by markdown parser -->
+    </div>
+  </div>
+
+  <!-- Tab 3: Rules Evolution -->
+  <div class="tab-pane" id="tab-pane-rules">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span>🧬 经验与规则自进化池</span></div>
+        <span style="font-size:11.5px; color:var(--text-secondary);">从每日踩坑与人类决策反馈中蒸馏，观察期后沉淀回 AGENTS.md</span>
+      </div>
+      <table class="rule-table">
+        <thead>
+          <tr>
+            <th>规则代号</th>
+            <th>适用部门</th>
+            <th>核心准则</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="rules-tbody">
+          <!-- Rendered by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab 4: Archive -->
+  <div class="tab-pane" id="tab-pane-archive">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span>🗂️ 历史晨报与复盘归档</span></div>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+        <div>
+          <h4 style="font-size:12.5px; color:var(--text-secondary); margin-bottom:8px;">🌅 历史晨会简报</h4>
+          <div class="mit-list" id="archive-briefs-list"></div>
+        </div>
+        <div>
+          <h4 style="font-size:12.5px; color:var(--text-secondary); margin-bottom:8px;">🌙 历史晚间复盘</h4>
+          <div class="mit-list" id="archive-reviews-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const data = window.__DASHBOARD_DATA__ || {};
+
+    function selectOpsPath(relPath) {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: "munk:ops-select-path", path: relPath }, "*");
+      } else {
+        showToast("已选择路径: " + relPath);
+      }
+    }
+
+    function jumpToDepartment(deptId) {
+      const names = {
+        radar: "📡 情报雷达",
+        brain: "🧠 第二大脑",
+        studio: "🎨 内容工坊",
+        wealth: "💰 财富与搞钱"
+      };
+      switchTab("departments");
+      const card = document.getElementById(`dept-card-${deptId}`);
+      if (card) {
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        card.style.borderColor = "var(--accent-indigo)";
+        setTimeout(() => { card.style.borderColor = ""; }, 1800);
+      }
+      if (names[deptId]) {
+        showToast(`请在左侧「项目」列表点击「${names[deptId]}」打开该部门完整看板`);
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.style.display = "block";
+      setTimeout(() => { t.style.display = "none"; }, 2500);
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+
+      const btn = document.getElementById(`tab-btn-${name}`);
+      const pane = document.getElementById(`tab-pane-${name}`);
+      if (btn) btn.classList.add("active");
+      if (pane) pane.classList.add("active");
+    }
+
+    function renderHeader() {
+      const r = data.rhythm || {};
+      const elTitle = document.getElementById("rhythm-title");
+      const elDesc = document.getElementById("rhythm-desc");
+      const elIcon = document.getElementById("rhythm-icon");
+
+      if (r.label) elTitle.textContent = r.label;
+      if (r.desc) elDesc.textContent = r.desc;
+      if (r.phase === "morning_brief") elIcon.textContent = "🌅";
+      else if (r.phase === "night_retro") elIcon.textContent = "🌙";
+      else if (r.phase === "night_quiet") elIcon.textContent = "🌌";
+      else elIcon.textContent = "🚀";
+
+      const stats = data.mits?.stats || {};
+      document.getElementById("kpi-mit-rate").textContent = `${stats.completionRatePct || 0}%`;
+      document.getElementById("kpi-mit-fraction").textContent = `(${stats.done || 0}/${stats.total || 0})`;
+
+      const d = data.departments || {};
+      if (d.radar) document.getElementById("kpi-radar-signals").textContent = d.radar.signalsCount || 0;
+      if (d.studio) document.getElementById("kpi-studio-ready").textContent = d.studio.readyCount || 0;
+      if (d.wealth) document.getElementById("kpi-wealth-runway").textContent = (d.wealth.runwayMonths || 0).toFixed(1);
+      if (data.rules) document.getElementById("kpi-rules-count").textContent = data.rules.totalCount || 4;
+    }
+
+    function renderMits() {
+      const container = document.getElementById("mit-container");
+      container.innerHTML = "";
+      const mits = data.mits?.mits || [];
+
+      mits.forEach((m, idx) => {
+        const item = document.createElement("div");
+        item.className = `mit-item ${m.status === "done" ? "done" : ""}`;
+
+        const isChecked = m.status === "done";
+        const priorityClass = m.priority === "P0" ? "mit-priority--p0" : "mit-priority--p1";
+
+        item.innerHTML = `
+          <input type="checkbox" class="mit-checkbox" ${isChecked ? "checked" : ""} onchange="toggleMit('${m.id}', this.checked)" />
+          <div class="mit-content">
+            <div class="mit-header">
+              <span class="mit-priority ${priorityClass}">${m.priority || "P0"}</span>
+              <span class="mit-dept">${m.departmentName || m.department}</span>
+              <span class="badge ${m.status === "done" ? "badge--emerald" : m.status === "in_progress" ? "badge--amber" : "badge--rose"}">
+                ${m.status === "done" ? "✓ 已达成" : m.status === "in_progress" ? "⚡ 推进中" : "🚫 卡阻"}
+              </span>
+              <span class="num" style="font-size:11px; color:var(--text-muted); margin-left:auto;">⏱️ ~${m.timeEstimateMinutes || 30}m</span>
+            </div>
+            <div class="mit-text">${m.title}</div>
+            <div class="mit-notes">${m.notes || ""}</div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function toggleMit(id, isChecked) {
+      const m = data.mits?.mits?.find(item => item.id === id);
+      if (m) {
+        m.status = isChecked ? "done" : "in_progress";
+        showToast(`已${isChecked ? "标记完成" : "恢复推进"}: ${m.title}`);
+        renderHeader();
+        renderMits();
+      }
+    }
+
+    function renderDepartments() {
+      const grid = document.getElementById("dept-grid");
+      grid.innerHTML = "";
+      const d = data.departments || {};
+
+      const list = [
+        {
+          id: "radar",
+          title: "📡 情报雷达 (Radar)",
+          metric1: { label: "捕获情报", val: `${d.radar?.signalsCount || 0} 条` },
+          metric2: { label: "S 级异动", val: `${d.radar?.highImpactCount || 0} 条` },
+          snippet: `最新信号: ${d.radar?.latestSignal?.title || "监控中，暂无异常"}`
+        },
+        {
+          id: "brain",
+          title: "🧠 第二大脑 (Brain)",
+          metric1: { label: "认知火花", val: `${d.brain?.sparksCount || 0} 条` },
+          metric2: { label: "沉淀主题", val: `${d.brain?.topicsCount || 0} 个` },
+          snippet: `心法: “${d.brain?.weeklyPrinciple || "少即是多"}”`
+        },
+        {
+          id: "studio",
+          title: "🎨 内容工坊 (Studio)",
+          metric1: { label: "待审成稿", val: `${d.studio?.readyCount || 0} 篇` },
+          metric2: { label: "已发作品", val: `${d.studio?.publishedCount || 0} 篇` },
+          snippet: `就绪: ${d.studio?.latestReady?.title || "暂无待发稿件"}`
+        },
+        {
+          id: "wealth",
+          title: "💰 财富与搞钱 (Wealth)",
+          metric1: { label: "安全跑道", val: `${(d.wealth?.runwayMonths || 0).toFixed(1)} 月` },
+          metric2: { label: "待收回 AR", val: `¥${(d.wealth?.pendingArCNY || 0).toLocaleString()}` },
+          snippet: (() => {
+            const net = Number(d.wealth?.monthNetCashflowCNY || 0);
+            const sign = net >= 0 ? "+" : "-";
+            return `本月现金流净额: ${sign}¥${Math.abs(net).toLocaleString()} (${(d.wealth?.runwayMonths || 0) >= 24 ? "24m+ 充裕" : "关注跑道"})`;
+          })()
+        }
+      ];
+
+      list.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "dept-card";
+        card.id = `dept-card-${item.id}`;
+        card.innerHTML = `
+          <div class="dept-head">
+            <span class="dept-title">${item.title}</span>
+            <button class="chip-btn" onclick="jumpToDepartment('${item.id}')">切换部门指引</button>
+          </div>
+          <div class="dept-metrics">
+            <div class="dept-metric-item">
+              <span class="dept-metric-label">${item.metric1.label}</span>
+              <span class="dept-metric-val num">${item.metric1.val}</span>
+            </div>
+            <div class="dept-metric-item">
+              <span class="dept-metric-label">${item.metric2.label}</span>
+              <span class="dept-metric-val num">${item.metric2.val}</span>
+            </div>
+          </div>
+          <div class="dept-snippet">${item.snippet}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderRules() {
+      const tbody = document.getElementById("rules-tbody");
+      tbody.innerHTML = "";
+      const rules = data.rules?.items || [];
+
+      rules.forEach(r => {
+        const tr = document.createElement("tr");
+        const isMerged = r.status === "MERGED";
+        tr.innerHTML = `
+          <td><span class="badge ${isMerged ? "badge--emerald" : "badge--indigo"}">${r.code}</span></td>
+          <td><code>${r.department}</code></td>
+          <td style="font-weight:500;">${r.title}</td>
+          <td><span class="badge ${isMerged ? "badge--emerald" : "badge--amber"}">${isMerged ? "✓ 已固化入 AGENTS.md" : "⏳ 观察期 (PROPOSED)"}</span></td>
+          <td><button class="chip-btn" onclick="selectOpsPath('rules-evolution.md')">查看详情</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderArchives() {
+      const briefsContainer = document.getElementById("archive-briefs-list");
+      const reviewsContainer = document.getElementById("archive-reviews-list");
+      briefsContainer.innerHTML = "";
+      reviewsContainer.innerHTML = "";
+
+      const briefs = data.archives?.briefs || [];
+      const reviews = data.archives?.reviews || [];
+
+      briefs.forEach(b => {
+        const item = document.createElement("div");
+        item.className = "mit-item";
+        item.innerHTML = `
+          <div class="mit-content">
+            <div class="mit-header">
+              <span class="badge badge--indigo">${b.date}</span>
+              <span style="font-size:12px; font-weight:500;">🌅 晨会拍板简报</span>
+              <button class="chip-btn" style="margin-left:auto;" onclick="selectOpsPath('${b.file}')">打开原文件</button>
+            </div>
+          </div>
+        `;
+        briefsContainer.appendChild(item);
+      });
+
+      reviews.forEach(r => {
+        const item = document.createElement("div");
+        item.className = "mit-item";
+        item.innerHTML = `
+          <div class="mit-content">
+            <div class="mit-header">
+              <span class="badge badge--emerald">${r.date}</span>
+              <span style="font-size:12px; font-weight:500;">🌙 晚间复盘与规则进化</span>
+              <button class="chip-btn" style="margin-left:auto;" onclick="selectOpsPath('${r.file}')">打开原文件</button>
+            </div>
+          </div>
+        `;
+        reviewsContainer.appendChild(item);
+      });
+    }
+
+    function parseSimpleMarkdown(md) {
+      if (!md) return "<p style='color:var(--text-muted);'>暂无内容</p>";
+      let html = md
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/^# (.*$)/gim, "<h1>$1</h1>")
+        .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+        .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+        .replace(/^\> (.*$)/gim, "<blockquote>$1</blockquote>")
+        .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
+        .replace(/\*(.*?)\*/gim, "<em>$1</em>")
+        .replace(/`([^`]+)`/gim, "<code>$1</code>")
+        .replace(/^- \[x\] (.*$)/gim, "<li style='list-style:none;'>✅ $1</li>")
+        .replace(/^- \[ \] (.*$)/gim, "<li style='list-style:none;'>⬜ $1</li>")
+        .replace(/^- (.*$)/gim, "<li>$1</li>")
+        .replace(/\n\n/gim, "<br/>");
+      return html;
+    }
+
+    function renderDocs() {
+      const briefRaw = data.archives?.todayBrief?.raw || `
+# 🌅 晨会拍板简报 · 2026-11-04
+> **核心经营基调**：现金流极其健康（Runway 28.5m），今天核心任务是完成 ¥15,000 咨询方案交付与《本地浏览器 Agent》高质量长文发布。
+
+## 🎯 今日 3 大必赢战役 (MITs)
+- [x] **MIT 1（搞钱 / Wealth）**：推进并发送 Cloudflare Workers 迁移咨询方案 (¥15,000 报价与 SOW)
+- [x] **MIT 2（影响力 / Studio）**：审阅并一键发布《为什么本地浏览器 Agent 正在替代 80% 的套壳 SaaS》
+- [ ] **MIT 3（认知 / Radar）**：针对 DeepSeek-V3 本地量化服务线索做第二轮竞品拆解与可行性测试
+
+## 📡 部门动态速览
+- **Radar**：抓取到 2 条高价值信号，DeepSeek-V3 本地化部署需求激增；
+- **Brain**：沉淀心法“真正的护城河不是模型参数，而是用户本地数据主权”；
+- **Studio**：成稿已备好，预计上午 11:30 发送；
+- **Wealth**：净资产 ¥1,032,500，Runway 28.5 个月，应收账款 ¥12,000。
+      `;
+
+      const reviewRaw = data.archives?.todayReview?.raw || `
+# 🌙 晚间复盘与进化 · 2026-11-04
+> **本日总结**：今日 3 项 MIT 达成 2 项，1 项跨夜推进；内容已成功发布并带来 3 个高意向咨询潜在客户；提炼 1 条 Studio 负向开篇规则。
+
+## 🎯 今日 MIT 完成审计
+- [x] **MIT 1（搞钱 / Wealth）**：Cloudflare Workers 迁移咨询方案已发出（客户已确认收到并同意预付款 ¥7,500）
+- [x] **MIT 2（影响力 / Studio）**：已审阅并发布《为什么本地浏览器 Agent 正在替代 80% 的套壳 SaaS》
+- [ ] **MIT 3（认知 / Radar）**：DeepSeek-V3 本地量化服务线索竞品拆解（进行中，已完成 75%）
+
+## 🔍 今日踩坑与反思
+- **Studio 开篇 AI 味过重**：初稿开头第一句为“在当今快节奏的世界里，AI 技术正如火如荼...”，人类批注“把第一段全删掉直接看代码”。
+
+## 🧬 规则沉淀建议
+- **提议规则**：\`RULE-EVO-20261104-01\` · 所有文章与短文开头第一句禁止使用任何宏大背景式陈述，必须从具体的痛点场景直接切入。
+      `;
+
+      document.getElementById("brief-viewer").innerHTML = parseSimpleMarkdown(briefRaw);
+      document.getElementById("review-viewer").innerHTML = parseSimpleMarkdown(reviewRaw);
+    }
+
+    function refreshPatrol() {
+      showToast("正在刷新全公司数据并重绘看板...");
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+
+    renderHeader();
+    renderMits();
+    renderDepartments();
+    renderRules();
+    renderArchives();
+    renderDocs();
+  </script>
+</body>
+</html>

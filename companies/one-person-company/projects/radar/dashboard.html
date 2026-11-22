@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>情报雷达 · 实时监控看板</title>
+  <style>
+    :root {
+      --bg-canvas: #0a0c10;
+      --bg-surface: #11151e;
+      --bg-elevated: #171c28;
+      --bg-hover: #1e2536;
+      --border-subtle: #1f2737;
+      --border-strong: #2d384f;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-emerald: #10b981;
+      --accent-emerald-bg: rgba(16, 185, 129, 0.12);
+      --accent-amber: #f59e0b;
+      --accent-amber-bg: rgba(245, 158, 11, 0.12);
+      --accent-rose: #f43f5e;
+      --accent-rose-bg: rgba(244, 63, 94, 0.12);
+      --accent-indigo: #6366f1;
+      --accent-indigo-bg: rgba(99, 102, 241, 0.14);
+      --radius: 10px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Inter", system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.5;
+      padding: 18px 20px 32px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px;
+    }
+    .topbar-title { display: flex; align-items: center; gap: 10px; }
+    .topbar-title h1 { font-size: 16px; font-weight: 600; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+      border-radius: 999px; font-size: 11px; font-weight: 500; border: 1px solid transparent;
+    }
+    .badge--emerald { background: var(--accent-emerald-bg); color: #34d399; border-color: rgba(16,185,129,0.28); }
+    .badge--amber { background: var(--accent-amber-bg); color: #fbbf24; border-color: rgba(245,158,11,0.28); }
+    .badge--rose { background: var(--accent-rose-bg); color: #fb7185; border-color: rgba(244,63,94,0.28); }
+    .badge--indigo { background: var(--accent-indigo-bg); color: #818cf8; border-color: rgba(99,102,241,0.28); }
+    .quick-links { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip-btn {
+      background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 4px 9px; font-size: 11.5px; cursor: pointer; transition: all 0.15s ease;
+    }
+    .chip-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-strong); }
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 10px; margin-bottom: 16px;
+    }
+    .kpi-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius);
+      padding: 12px 14px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .kpi-label { color: var(--text-secondary); font-size: 11.5px; display: flex; justify-content: space-between; }
+    .kpi-val { font-size: 20px; font-weight: 700; }
+    .kpi-sub { color: var(--text-muted); font-size: 11px; display: flex; justify-content: space-between; }
+    .tabs {
+      display: flex; gap: 6px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px; overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent; color: var(--text-secondary); border: none; border-bottom: 2px solid transparent;
+      padding: 8px 12px; font-size: 12.5px; font-weight: 500; cursor: pointer; white-space: nowrap;
+    }
+    .tab-btn.active { color: var(--text-primary); border-bottom-color: var(--accent-indigo); background: rgba(99,102,241,0.06); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .panel {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius);
+      padding: 14px 16px; margin-bottom: 14px;
+    }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
+    .panel-title { font-size: 13.5px; font-weight: 600; }
+    .signal-list { display: flex; flex-direction: column; gap: 10px; }
+    .signal-card {
+      background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px;
+    }
+    .signal-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+    .signal-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+    .signal-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;
+      margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 12px;
+    }
+    .signal-box-label { color: var(--text-muted); font-size: 11px; margin-bottom: 2px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { text-align: left; color: var(--text-muted); font-weight: 500; padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); }
+    td { padding: 9px 10px; border-bottom: 1px solid rgba(31,39,55,0.55); vertical-align: middle; }
+    .kw-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+  <!-- MUNK_DASHBOARD_DATA_START -->
+<script id="munk-dashboard-data">
+window.__DASHBOARD_DATA__ = {
+  "generatedAt": "2026-11-16T03:27:24.797Z",
+  "profile": {
+    "niche": "AI 工具实战、独立开发与超级个体工作流",
+    "target_audience": "对 AI 提效、自动化搞钱、新奇数字工具感兴趣的创作者与行动派",
+    "language_preference": "zh-CN"
+  },
+  "keywords": {
+    "boost": [
+      "agent",
+      "workflow",
+      "mcp",
+      "open-source",
+      "local-first",
+      "solo",
+      "monetize",
+      "automation",
+      "cursor",
+      "claude",
+      "工作流",
+      "一人公司",
+      "超级个体",
+      "自动化",
+      "变现",
+      "信息差",
+      "效率神器",
+      "副业"
+    ],
+    "mute": [
+      "benchmark leaderboard",
+      "celebrity gossip",
+      "娱乐八卦",
+      "纯算力财报"
+    ]
+  },
+  "socialWindow": {
+    "active_hours_start": 8,
+    "active_hours_end": 22,
+    "cooldown_minutes": 210
+  },
+  "stats": {
+    "totalSources": 7,
+    "enabledSources": 6,
+    "publicSignalsCount": 3,
+    "sTierCount": 1,
+    "socialArbitrageCount": 2,
+    "boostKeywordsCount": 18
+  },
+  "publicSources": [
+    {
+      "id": "hn-top",
+      "name": "Hacker News 高热讨论",
+      "type": "hn_top",
+      "min_score": 120,
+      "limit": 15,
+      "enabled": true
+    },
+    {
+      "id": "hn-show",
+      "name": "Show HN 新产品与开源首发",
+      "type": "hn_show",
+      "min_score": 40,
+      "limit": 10,
+      "enabled": true
+    },
+    {
+      "id": "github-trending-daily",
+      "name": "GitHub 今日飙升开源项目",
+      "type": "rss",
+      "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
+      "limit": 10,
+      "enabled": true
+    },
+    {
+      "id": "simon-willison",
+      "name": "Simon Willison's Weblog (AI 工程与工具实战风向标)",
+      "type": "rss",
+      "url": "https://simonwillison.net/atom/everything/",
+      "limit": 5,
+      "enabled": true
+    }
+  ],
+  "socialChannels": [
+    {
+      "id": "x-twitter",
+      "platform": "X (Twitter)",
+      "enabled": true,
+      "entry_url": "https://x.com/home",
+      "search_queries": [
+        "(\"AI agent\" OR \"workflow\" OR \"MCP\") min_faves:100",
+        "\"build in public\" (revenue OR MRR OR launched) min_faves:50"
+      ],
+      "look_for": "海外野生高赞工作流、独立开发者晒出的真实变现小产品、正在发酵的新工具实测与争议"
+    },
+    {
+      "id": "xiaohongshu",
+      "platform": "小红书",
+      "enabled": true,
+      "entry_url": "https://www.xiaohongshu.com/explore",
+      "search_queries": [
+        "AI工作流",
+        "一人公司",
+        "效率神器"
+      ],
+      "look_for": "近 3 天互动率异常高的『低粉爆款』图文，评论区高频出现『求教程 / 怎么弄 / 什么软件』的真实需求；同时核验前面在 X 抓到的海外新热点在小红书是否尚属空白"
+    },
+    {
+      "id": "youtube",
+      "platform": "YouTube",
+      "enabled": false,
+      "entry_url": "https://www.youtube.com",
+      "search_queries": [
+        "AI agent workflow tutorial",
+        "one person business AI automation"
+      ],
+      "look_for": "高播放量实操视频的选题切入角、封面钩子与高赞评论痛点（默认关闭，对公司负责人说一声即可开启）"
+    }
+  ],
+  "publicSignals": [
+    {
+      "id": "SIG-20261104-01",
+      "tier": "S",
+      "source": "Show HN / GitHub Trending",
+      "title": "Browser-Use Local MCP 轻量级无头编排器 24h 暴涨 1,800 Stars",
+      "url": "https://news.ycombinator.com/",
+      "whatHappened": "海外开发者发布基于本地已登录浏览器 Profile 的超薄自动化协议，评论区大量独立开发者讨论如何用它替代昂贵的 SaaS API 连接器。",
+      "whyItMatters": "直接印证『一人公司无需购买企业级 SaaS API，复用个人浏览器登录态即可打通经营后台』的趋势，且国内社媒目前仅有个别搬运标题，尚无实操拆解。",
+      "downstreamTarget": "studio + brain",
+      "actionProposal": "已推送至 brain 生成认知素材，建议 studio 制作一期《别再买 $99/月 的连接器了：本地浏览器 Agent 实战》图文与 60s 动画短片。",
+      "detailPath": "signals/2026-11-04.md"
+    },
+    {
+      "id": "SIG-20261104-02",
+      "tier": "A",
+      "source": "Hacker News 高热讨论",
+      "title": "Solo Founders 晒账单讨论贴：为什么 80% 的 AI 套壳微 SaaS 死于高退订率",
+      "url": "https://news.ycombinator.com/",
+      "whatHappened": "超过 320 条评论复盘 2026 年独立开发者微产品存活率，指出『一次性收费配置包/工作流资产 + 高客单顾问』的净利率远高于月付 $9 的脆弱套壳工具。",
+      "whyItMatters": "为 wealth 部门的 Offer Ladder 定价策略提供了极佳的一手反面案例与数据支撑。",
+      "downstreamTarget": "wealth + brain",
+      "actionProposal": "已同步至 brain/topics/one-person-company-leverage.md 补充反面论据。",
+      "detailPath": "signals/2026-11-04.md"
+    },
+    {
+      "id": "SIG-20261104-03",
+      "tier": "B",
+      "source": "Simon Willison's Weblog",
+      "title": "使用本地脚本 + 结构化 JSON 替代复杂 Agent 记忆向量库的实践笔记",
+      "url": "https://simonwillison.net/",
+      "whatHappened": "长文对比了 RAG 向量检索与纯文本 Markdown + Grep/脚本索引在个人知识管理上的准确率差异。",
+      "whyItMatters": "与本模板 brain 部门『文件即事实、不搞黑盒向量库』的路线高度共鸣。",
+      "downstreamTarget": "brain",
+      "actionProposal": "归档备查，可在写作第二大脑主题长文时作为权威引证。",
+      "detailPath": "signals/2026-11-04.md"
+    }
+  ],
+  "socialSignals": [
+    {
+      "id": "SOC-20261104-01",
+      "platform": "X → 小红书 (跨网信息差)",
+      "topic": "海外爆款自动化工具的本土化零门槛配置包",
+      "metrics": "X 原帖 4.2k 收藏 / 小红书相关实操教程仅 3 篇且评论区 60+ 条『求配置包/求汉化平替』",
+      "arbitrageGap": "🟢 极高信息差（外网热议 48h，内网尚未出现开箱即用方案）",
+      "userPainQuote": "“跟着英文文档配了一晚上全报环境错误，要是有人出个一键导入包我愿意直接付 99 块省时间！”",
+      "downstreamTarget": "wealth (SPARK-W01) + studio",
+      "status": "已移交 wealth 立项 48h 烟雾测试 (EXP-2026-11-01)",
+      "detailPath": "signals/social-2026-11-04.md"
+    },
+    {
+      "id": "SOC-20261104-02",
+      "platform": "小红书 低粉爆款拆解",
+      "topic": "《我把写了 3 年的 Notion 笔记全删了，换成了这套本地文件工作流》",
+      "metrics": "粉丝仅 1,200 的账号单篇获赞 5,800+，收藏比高达 1.4x",
+      "arbitrageGap": "🟡 痛点共鸣极强（反焦虑 + 晒真实目录结构图）",
+      "userPainQuote": "“收藏了 500 篇干货从来没打开过第二次，到底怎么才能让笔记真正帮我写稿赚钱？”",
+      "downstreamTarget": "studio (SPARK-S01)",
+      "status": "已移交 brain/sparks.md 作为 studio 选题弹药",
+      "detailPath": "signals/social-2026-11-04.md"
+    }
+  ]
+};
+</script>
+<!-- MUNK_DASHBOARD_DATA_END -->
+
+  <header class="topbar">
+    <div class="topbar-title">
+      <h1>📡 情报雷达 · 异动与跨网信息差看板</h1>
+      <span class="badge badge--emerald">0-Token 守卫值守中</span>
+    </div>
+    <div class="quick-links">
+      <button class="chip-btn" onclick="openProjectFile('watchlist.json')">🛰️ 监测源配置 (watchlist.json)</button>
+      <button class="chip-btn" onclick="openProjectFile('signals/2026-11-04.md')">📄 今日公开源三联单</button>
+      <button class="chip-btn" onclick="openProjectFile('signals/social-2026-11-04.md')">💬 社媒信息差档案</button>
+      <button class="chip-btn" onclick="openProjectFile('guards/radar-sentinel.mjs')">🛡️ 哨兵脚本</button>
+    </div>
+  </header>
+
+  <section class="kpi-grid" id="kpi-grid"></section>
+
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="switchTab('signals', this)">🚨 公开源异动三联单 (S/A/B)</button>
+    <button class="tab-btn" onclick="switchTab('social', this)">🌐 社媒爆款与跨网信息差</button>
+    <button class="tab-btn" onclick="switchTab('sources', this)">🛰️ 监控源矩阵与加权词库</button>
+  </nav>
+
+  <div id="tab-signals" class="tab-pane active">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">🔥 高信噪比情报三联单（发生了什么 × 为什么重要 × 下游怎么用）</span>
+        <div class="quick-links">
+          <button class="chip-btn" onclick="filterSignals('all')">全部</button>
+          <button class="chip-btn" onclick="filterSignals('S')">🔴 S级 (立即行动)</button>
+          <button class="chip-btn" onclick="filterSignals('A')">🟡 A级 (高价值)</button>
+          <button class="chip-btn" onclick="filterSignals('B')">🔵 B级 (认知储备)</button>
+        </div>
+      </div>
+      <div class="signal-list" id="public-signals-list"></div>
+    </div>
+  </div>
+
+  <div id="tab-social" class="tab-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">💬 跨网信息差与评论区『求教程/求工具』真实痛点</span>
+        <button class="chip-btn" onclick="openProjectFile('signals/social-2026-11-04.md')">打开完整社媒巡检报告</button>
+      </div>
+      <div class="signal-list" id="social-signals-list"></div>
+    </div>
+  </div>
+
+  <div id="tab-sources" class="tab-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">🎯 赛道画像与信噪比过滤词库</span>
+        <button class="chip-btn" onclick="openProjectFile('watchlist.json')">编辑 watchlist.json</button>
+      </div>
+      <div id="profile-box" style="margin-bottom:12px;color:var(--text-secondary);"></div>
+      <div class="signal-box-label">🟢 加权捕捉词 (Boost Keywords)</div>
+      <div class="kw-wrap" id="boost-kw"></div>
+      <div class="signal-box-label" style="margin-top:10px;">🔴 静音屏蔽词 (Mute Noise)</div>
+      <div class="kw-wrap" id="mute-kw"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">🛰️ 公开信源与社媒巡检通道状态</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>渠道名称</th>
+              <th>类型</th>
+              <th>过滤阈值 / 搜索指令</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody id="sources-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openProjectFile(path) {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: "munk:ops-select-path", path }, "*");
+      }
+    }
+
+    function switchTab(id, btn) {
+      document.querySelectorAll(".tab-pane").forEach((el) => el.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach((el) => el.classList.remove("active"));
+      document.getElementById("tab-" + id)?.classList.add("active");
+      btn?.classList.add("active");
+    }
+
+    function renderAll() {
+      const data = window.__DASHBOARD_DATA__ || {};
+      const st = data.stats || {};
+      const sw = data.socialWindow || {};
+
+      document.getElementById("kpi-grid").innerHTML = `
+        <div class="kpi-card">
+          <div class="kpi-label"><span>S 级高优行动信号</span><span class="badge badge--rose">立即跟进</span></div>
+          <div class="kpi-val num">${st.sTierCount ?? 0} <span style="font-size:13px;font-weight:500;">条</span></div>
+          <div class="kpi-sub"><span>今日公开源总精选 ${st.publicSignalsCount ?? 0} 条</span><span>噪音已过滤</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><span>跨网信息差与痛点线索</span><span class="badge badge--emerald">X &rarr; 小红书</span></div>
+          <div class="kpi-val num">${st.socialArbitrageCount ?? 0} <span style="font-size:13px;font-weight:500;">个</span></div>
+          <div class="kpi-sub"><span>评论区高频付费/求教程痛点</span><span>直供 studio/wealth</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><span>活跃监测源矩阵</span><span class="badge badge--indigo">自动轮询</span></div>
+          <div class="kpi-val num">${st.enabledSources ?? 0} / ${st.totalSources ?? 0}</div>
+          <div class="kpi-sub"><span>公开源每小时 0-Token 嗅探</span><span>无变化不费 Token</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><span>社媒浏览器巡检时间窗</span><span class="badge badge--amber">防风控冷却</span></div>
+          <div class="kpi-val num">${sw.active_hours_start ?? 8}:00 - ${sw.active_hours_end ?? 22}:00</div>
+          <div class="kpi-sub"><span>夜间静默不扰</span><span>冷却间隔 ${sw.cooldown_minutes ?? 210} 分钟</span></div>
+        </div>
+      `;
+
+      window.__PUBLIC_SIGNALS__ = data.publicSignals || [];
+      filterSignals("all");
+
+      const socialList = document.getElementById("social-signals-list");
+      socialList.innerHTML = (data.socialSignals || [])
+        .map((s) => `
+          <div class="signal-card">
+            <div class="signal-top">
+              <span class="signal-title">${s.topic}</span>
+              <span class="badge badge--emerald">${s.platform}</span>
+            </div>
+            <div style="color:var(--text-secondary);font-size:12px;">📊 热度表现：${s.metrics} · <strong>${s.arbitrageGap}</strong></div>
+            <div class="signal-grid">
+              <div>
+                <div class="signal-box-label">💬 评论区用户原话痛点</div>
+                <div style="color:#fbbf24;">${s.userPainQuote}</div>
+              </div>
+              <div>
+                <div class="signal-box-label">🎯 下游派发与转化状态 (${s.downstreamTarget})</div>
+                <div>${s.status} <button class="chip-btn" style="margin-left:6px;" onclick="openProjectFile('${s.detailPath}')">查看详情</button></div>
+              </div>
+            </div>
+          </div>
+        `)
+        .join("");
+
+      const pf = data.profile || {};
+      document.getElementById("profile-box").innerHTML =
+        `<strong>核心赛道：</strong>${pf.niche || ""} &nbsp;|&nbsp; <strong>目标受众：</strong>${pf.target_audience || ""}`;
+      document.getElementById("boost-kw").innerHTML = ((data.keywords && data.keywords.boost) || [])
+        .map((k) => `<span class="badge badge--emerald">${k}</span>`)
+        .join("");
+      document.getElementById("mute-kw").innerHTML = ((data.keywords && data.keywords.mute) || [])
+        .map((k) => `<span class="badge badge--rose">${k}</span>`)
+        .join("");
+
+      const pubRows = (data.publicSources || []).map((s) => `
+        <tr>
+          <td><strong>${s.name}</strong></td>
+          <td><span class="badge badge--indigo">公开源 (${s.type})</span></td>
+          <td class="num">${s.url || `min_score: ${s.min_score}, limit: ${s.limit}`}</td>
+          <td>${s.enabled !== false ? `<span class="badge badge--emerald">启用中</span>` : `<span class="badge badge--amber">已停用</span>`}</td>
+        </tr>
+      `);
+      const socRows = (data.socialChannels || []).map((s) => `
+        <tr>
+          <td><strong>${s.platform}</strong></td>
+          <td><span class="badge badge--amber">社媒浏览器 (browse)</span></td>
+          <td style="color:var(--text-secondary)">${(s.search_queries || []).join(" | ")}</td>
+          <td>${s.enabled !== false ? `<span class="badge badge--emerald">启用中</span>` : `<span class="badge badge--amber">按需开启</span>`}</td>
+        </tr>
+      `);
+      document.getElementById("sources-tbody").innerHTML = pubRows.concat(socRows).join("");
+    }
+
+    function filterSignals(tier) {
+      const list = (window.__PUBLIC_SIGNALS__ || []).filter((s) => tier === "all" || s.tier === tier);
+      document.getElementById("public-signals-list").innerHTML = list
+        .map((s) => {
+          const badge =
+            s.tier === "S"
+              ? `<span class="badge badge--rose">🔴 S级 · 立即行动</span>`
+              : s.tier === "A"
+                ? `<span class="badge badge--amber">🟡 A级 · 重点关注</span>`
+                : `<span class="badge badge--indigo">🔵 B级 · 认知储备</span>`;
+          return `
+            <div class="signal-card">
+              <div class="signal-top">
+                <span class="signal-title">[${s.id}] ${s.title}</span>
+                <div>${badge} <span class="badge badge--indigo">${s.source}</span></div>
+              </div>
+              <div class="signal-grid">
+                <div>
+                  <div class="signal-box-label">1. 发生了什么 (What Happened)</div>
+                  <div style="color:var(--text-secondary)">${s.whatHappened}</div>
+                </div>
+                <div>
+                  <div class="signal-box-label">2. 为什么重要 (Why It Matters)</div>
+                  <div style="color:var(--text-secondary)">${s.whyItMatters}</div>
+                </div>
+                <div>
+                  <div class="signal-box-label">3. 下游怎么用 (${s.downstreamTarget})</div>
+                  <div>${s.actionProposal} <button class="chip-btn" style="margin-left:6px;" onclick="openProjectFile('${s.detailPath}')">查看档案</button></div>
+                </div>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>

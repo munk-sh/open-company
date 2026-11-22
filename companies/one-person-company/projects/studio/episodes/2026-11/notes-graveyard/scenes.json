@@ -1,0 +1,46 @@
+{
+  "slug": "notes-graveyard",
+  "title": "为什么你的 AI 笔记最后都变成了数字垃圾场",
+  "pillar": "P2",
+  "aspect": "9:16",
+  "theme": "dark-keynote",
+  "voice": "zh-CN-YunxiNeural",
+  "status": "archived",
+  "renderPath": "renders/notes-graveyard/notes-graveyard-9x16.mp4",
+  "totalDuration": 58.4,
+  "scenes": [
+    {
+      "id": "scene-1-hook",
+      "startTime": 0,
+      "duration": 7.2,
+      "fragments": [2.6],
+      "kicker": "反常识",
+      "headline": "存得越多，越没用",
+      "subhead": "4,000 条笔记，打开过第二次的不到 3%",
+      "visualMetaphor": "笔记卡片像雪花堆满屏幕，最后压塌成一座灰色坟堆",
+      "narration": "我删掉了三年攒下的四千条笔记，产出反而翻了三倍。"
+    },
+    {
+      "id": "scene-2-mechanism",
+      "startTime": 7.2,
+      "duration": 28.6,
+      "fragments": [12.4, 19.8, 27.1],
+      "kicker": "机制",
+      "headline": "信号 × 原话 → 常青卡",
+      "subhead": "只留能改变判断、能直接产出的东西",
+      "visualMetaphor": "左侧外部信号流与右侧个人语录碰撞出火花，火花凝结成一张发光的常青卡",
+      "narration": "真正有复利的不是收藏，而是碰撞。外部的新信号，撞上你自己的原话和判断，才会长成一张能反复调用的常青卡。"
+    },
+    {
+      "id": "scene-3-takeaway",
+      "startTime": 35.8,
+      "duration": 22.6,
+      "fragments": [42.0, 49.5],
+      "kicker": "行动",
+      "headline": "今晚就做一件事",
+      "subhead": "把收藏夹清空成三张常青卡",
+      "visualMetaphor": "三张卡片依次翻面点亮，背后连线到『文章 / 视频 / 产品』三个出口",
+      "narration": "今晚别再收藏了。挑三条你最常想起的观点，写成三张卡，下周它们就会变成你的稿子。"
+    }
+  ]
+}

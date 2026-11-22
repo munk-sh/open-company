@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2026-11-16T03:27:24.833Z",
+  "stats": {
+    "topicsCount": 1,
+    "studioSparksCount": 1,
+    "wealthSparksCount": 1,
+    "principlesCount": 9,
+    "inboxPendingCount": 0
+  },
+  "topics": [
+    {
+      "id": "one-person-company-leverage",
+      "filename": "one-person-company-leverage.md",
+      "path": "topics/one-person-company-leverage.md",
+      "title": "一人公司与超级个体的杠杆设计",
+      "coreThesis": "“你负责拍板，让幕僚班子把脏活累活做完——一人公司不是一个人干十个人的苦力，而是一个人指挥一支全天候运转的队伍。”",
+      "evidenceCount": 6
+    }
+  ],
+  "sparks": [
+    {
+      "id": "SPARK-S01",
+      "target": "studio",
+      "title": "《为什么 90% 的人用 AI 记笔记最后都变成了数字垃圾场？》",
+      "angle": "痛批传统「只存不联、只做 TL;DR 摘要」的伪第二大脑玩法，展示如何用「外部信号 × 个人原话碰撞 $\\rightarrow$ 常青认知卡 $\\rightarrow$ 直接供弹写稿」形成复利闭环。",
+      "evidence": "引用 `topics/one-person-company-leverage.md` 中的反面教材与实操结构。",
+      "channels": "公众号深度长文 + 小红书架构图解卡 + X 观点串推。",
+      "status": "待认领 (ready)"
+    },
+    {
+      "id": "SPARK-W01",
+      "target": "wealth",
+      "title": "垂直赛道「海外爆款工具本土化平替 / 配置包」微产品验证",
+      "angle": "结合 `radar` 社媒巡检抓到的评论区高频痛点（海外某工具配置门槛高或订阅太贵），用 48 小时制作一份开箱即用的配置模板/工作流包，通过 `studio` 发布实测贴测试私信转化率。",
+      "evidence": "符合 `principles.md` 第 1、2 条（零库存、先验真需求、高复利数字资产）。",
+      "channels": "",
+      "status": "待评估 (ready)"
+    }
+  ],
+  "principles": [
+    {
+      "index": 1,
+      "title": "只做「高毛利、高复利、零库存/轻交付」的切口"
+    },
+    {
+      "index": 2,
+      "title": "先验真需求（痛点付费），再动手造东西"
+    },
+    {
+      "index": 3,
+      "title": "做「卖铲子」或「帮具体的人省时间/多赚钱」的事"
+    },
+    {
+      "index": 4,
+      "title": "一手实操与真金白银的数据 > 二手宏大叙事"
+    },
+    {
+      "index": 5,
+      "title": "反共识才有传播力，但反共识必须建立在硬事实之上"
+    },
+    {
+      "index": 6,
+      "title": "知识不为收藏，只为「改变判断」或「直接产出」"
+    },
+    {
+      "index": 7,
+      "title": "AI Agent 从「聊天玩具」走向「无人值守经营班子」的真实落地切口"
+    },
+    {
+      "index": 8,
+      "title": "海外已验证跑通（Indie Hackers / X）但中文圈尚处空白的超级个体商业模式"
+    },
+    {
+      "index": 9,
+      "title": "高信噪比个人 IP 的自动化内容复利系统（一次深度思考，多平台长尾获客）"
+    }
+  ],
+  "inbox": {
+    "pendingCount": 0,
+    "files": []
+  }
+}

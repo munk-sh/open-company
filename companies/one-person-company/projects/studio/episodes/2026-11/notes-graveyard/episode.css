@@ -1,0 +1,78 @@
+.stack-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  width: 100%;
+}
+
+.s1-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rose-num {
+  color: var(--accent-rose);
+}
+
+.card-tag {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.collider-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 18px;
+}
+
+.collider-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  width: 100%;
+}
+
+.node-label {
+  margin-top: 20px;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.flow-svg {
+  width: 100%;
+  max-width: 640px;
+  height: 140px;
+}
+
+.evergreen-core {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.outlets-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+}
+
+.s3-outlet {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.outlet-title {
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--text-primary);
+}

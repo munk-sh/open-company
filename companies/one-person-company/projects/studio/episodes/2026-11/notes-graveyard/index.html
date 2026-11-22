@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark-keynote">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>为什么你的 AI 笔记最后都变成了数字垃圾场</title>
+    <link rel="stylesheet" href="shared/styles/base.css" />
+    <link rel="stylesheet" href="episode.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  </head>
+  <body>
+    <div id="root" data-composition-id="root" data-start="0" data-duration="58.4" data-width="1080" data-height="1920">
+      <section id="clip-scene-1" class="clip" data-composition-id="scene-1-hook" data-start="0" data-duration="7.2"></section>
+      <section id="clip-scene-2" class="clip" data-composition-id="scene-2-mechanism" data-start="7.2" data-duration="28.6"></section>
+      <section id="clip-scene-3" class="clip" data-composition-id="scene-3-takeaway" data-start="35.8" data-duration="22.6"></section>
+
+      <!-- Scene 1: 反常识 (0s - 7.2s) -->
+      <div id="sheet-scene-1" class="scene-sheet">
+        <div class="scene-header">
+          <span class="scene-kicker">01 · 反常识</span>
+          <h1 class="scene-headline">存得越多，越没用</h1>
+          <p class="scene-subhead">4,000 条笔记，打开过第二次的不到 3%</p>
+        </div>
+        <div class="scene-stage">
+          <div class="stack-compare">
+            <div id="s1-graveyard" class="motion-card s1-card">
+              <span class="status-pill danger">收藏夹囤积</span>
+              <div class="metric-hero rose-num">4,000 条</div>
+              <div class="card-tag">二次打开率 &lt; 3%</div>
+            </div>
+            <div id="s1-leverage" class="motion-card s1-card">
+              <span class="status-pill ok">断舍离重构</span>
+              <div class="metric-hero">3x 产出</div>
+              <div class="card-tag">只留可复用母卡</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 2: 机制 (7.2s - 35.8s) -->
+      <div id="sheet-scene-2" class="scene-sheet">
+        <div class="scene-header">
+          <span class="scene-kicker">02 · 复利机制</span>
+          <h1 class="scene-headline">信号 × 原话 → 常青卡</h1>
+          <p class="scene-subhead">只留能改变判断、能直接产出的东西</p>
+        </div>
+        <div class="scene-stage">
+          <div class="collider-flow">
+            <div class="collider-inputs">
+              <div class="motion-card s2-input">
+                <span class="status-pill warn">外部新信号</span>
+                <div class="node-label">一手数据 · 异动</div>
+              </div>
+              <div class="motion-card s2-input">
+                <span class="status-pill warn">个人原话判断</span>
+                <div class="node-label">直觉吐槽 · 真账</div>
+              </div>
+            </div>
+            <svg class="flow-svg" viewBox="0 0 600 140" fill="none">
+              <path id="s2-path-left" d="M 150 10 C 150 85, 300 55, 300 128" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" />
+              <path id="s2-path-right" d="M 450 10 C 450 85, 300 55, 300 128" stroke="#3ddc84" stroke-width="4" stroke-linecap="round" />
+            </svg>
+            <div id="s2-evergreen" class="motion-card evergreen-core">
+              <span class="status-pill ok">常青认知卡</span>
+              <div class="metric-hero" style="margin-top: 18px;">∞ 复利调用</div>
+              <div class="card-tag">持续迭代 · 随时供弹</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 3: 行动 (35.8s - 58.4s) -->
+      <div id="sheet-scene-3" class="scene-sheet">
+        <div class="scene-header">
+          <span class="scene-kicker">03 · 今晚行动</span>
+          <h1 class="scene-headline">清空收藏夹 → 三张母卡</h1>
+          <p class="scene-subhead">每张卡直接驱动三条变现与内容出口</p>
+        </div>
+        <div class="scene-stage">
+          <div class="outlets-stack">
+            <div class="motion-card s3-outlet">
+              <span class="status-pill ok">出口 01</span>
+              <div class="outlet-title">深度长文母本</div>
+            </div>
+            <div class="motion-card s3-outlet">
+              <span class="status-pill ok">出口 02</span>
+              <div class="outlet-title">60s 动态短视频</div>
+            </div>
+            <div class="motion-card s3-outlet">
+              <span class="status-pill ok">出口 03</span>
+              <div class="outlet-title">微产品验证包</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Synced Chinese Subtitle Rail -->
+      <div class="caption-rail">
+        <div id="caption-text" class="caption-box">我删掉了三年攒下的四千条笔记</div>
+      </div>
+    </div>
+
+    <script src="shared/scripts/motion-primitives.js"></script>
+    <script src="timeline.js"></script>
+  </body>
+</html>

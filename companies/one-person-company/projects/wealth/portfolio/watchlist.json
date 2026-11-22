@@ -1,0 +1,45 @@
+{
+  "updatedAt": "2026-11-04",
+  "items": [
+    {
+      "id": "watch-sp500-qqq",
+      "symbol": "SPY / QQQ (标普500 & 纳指100)",
+      "bucket": "core_equity",
+      "currentValuationNote": "标普远期 PE ~21.4x，近期随美债收益率波动回调约 4.2%，令核心权益层占比降至 44.0%（低配 -6.0%）",
+      "buyZoneRule": "当核心权益层整体低配超过 -5% 或指数自高点回撤 >= 5% 时，启动分批定投补仓",
+      "trimZoneRule": "当核心权益层超配突破 +5%（即总占比 > 55%）且席勒 PE > 36x 时，止盈超额部分转入短债防守层",
+      "status": "action_buy",
+      "signalSummary": "触发再平衡补仓线：当前权益层低配 -6.0%，建议从现金/固收层调配约 ¥77,000 分 2 批补入宽基"
+    },
+    {
+      "id": "watch-csi-div",
+      "symbol": "515180 / 红利低波 ETF",
+      "bucket": "core_equity",
+      "currentValuationNote": "股息率 5.1%，与 10 年期国债利差仍处于历史较高性价比区间",
+      "buyZoneRule": "股息率 >= 5.0% 时逢跌定投，充当人民币现金流奶牛",
+      "trimZoneRule": "股息率被炒高跌破 3.6% 时分批切换至宽基",
+      "status": "hold",
+      "signalSummary": "股息安全垫稳健，维持底仓吃息"
+    },
+    {
+      "id": "watch-gold",
+      "symbol": "518880 / 黄金现货与 ETF",
+      "bucket": "gold_and_hedge",
+      "currentValuationNote": "当前占比 11.0%，位于 10% (±3%) 容忍带内",
+      "buyZoneRule": "占比低于 7% 时补足",
+      "trimZoneRule": "占比突破 13% 时被动止盈归位",
+      "status": "hold",
+      "signalSummary": "仓位标准，无需操作"
+    },
+    {
+      "id": "watch-usdcny",
+      "symbol": "USD/CNY 汇率与美元货基利差",
+      "bucket": "cash_and_fixed",
+      "currentValuationNote": "在岸/离岸汇率围绕 7.18 震荡，海外 Stripe/Gumroad 美元待结算收入约 $1,850",
+      "buyZoneRule": "汇率 < 7.05 时适度换汇补充美股定投弹药",
+      "trimZoneRule": "汇率 > 7.28 时将海外美元营收逢高结汇回流人民币防守池",
+      "status": "watch",
+      "signalSummary": "Stripe 账户有 $1,850 待结算款，可在月中结算后直接留作美元定投弹药，省去双边换汇磨损"
+    }
+  ]
+}

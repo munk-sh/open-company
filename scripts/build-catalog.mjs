@@ -39,6 +39,32 @@ const BILINGUAL_METADATA = {
       },
     },
   },
+  "one-person-company": {
+    name: {
+      zh: "一人公司 · 超级个体",
+      en: "One-Person Company",
+    },
+    description: {
+      zh: "一支替你运转「你自己」这家公司的 AI 幕僚班子：情报雷达盯风向、第二大脑攒认知、内容工坊做影响力、财富部门盯搞钱机会与账本、晨夕复盘管节奏与进化。直接跟公司负责人对话即可按需开关定制。",
+      en: "An AI team that runs your one-person company: Intel Radar for external signals, Second Brain for knowledge synthesis, Content Studio for multi-platform publishing, Wealth & Deals for revenue opportunities & ledger analysis, and Daily Patrol for morning briefings & nightly evolution.",
+    },
+    opsHighlights: {
+      zh: [
+        "radar：零 Token 预检 + 行业热点、舆情与信息差盯盘",
+        "brain：消化随手投喂的笔记、长文与录音，构建个人认知网",
+        "studio：把外部情报与个人观点裂变为多平台待发成稿并呈批",
+        "wealth：盯搞钱痛点、套利线索与收支数据算账",
+        "daily-patrol：早 08:00 一页纸拍板早报 + 晚 21:00 复盘进化",
+      ],
+      en: [
+        "radar: Zero-token preflight watch for industry signals & trends",
+        "brain: Second brain that digests notes, links & voice memos into reusable insights",
+        "studio: Multi-platform content production staged for one-click human approval",
+        "wealth: Opportunity hunting, deal evaluation & personal ledger analytics",
+        "daily-patrol: 08:00 executive morning brief & 21:00 nightly review",
+      ],
+    },
+  },
 };
 
 function parseScalarYaml(text) {

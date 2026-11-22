@@ -1,0 +1,211 @@
+/* ==========================================================================
+   One-Person Studio — Shared Motion Video Design System (16:9 & 9:16)
+   ========================================================================== */
+
+:root,
+[data-theme="dark-keynote"] {
+  --bg-canvas: #070a0f;
+  --bg-surface: #0f1623;
+  --bg-elevated: #162033;
+  --border-subtle: #1e2d45;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-emerald: #3ddc84;
+  --accent-cyan: #38bdf8;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --grid-line: rgba(56, 189, 248, 0.045);
+}
+
+[data-theme="clean-editorial"] {
+  --bg-canvas: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-elevated: #f1f5f9;
+  --border-subtle: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent-emerald: #059669;
+  --accent-cyan: #0284c7;
+  --accent-amber: #d97706;
+  --accent-rose: #e11d48;
+  --grid-line: rgba(15, 23, 42, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: "PingFang SC", "Noto Sans SC", "Inter", system-ui, sans-serif;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-canvas);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* HyperFrames timed scene container */
+.clip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Scene sheet wrapper controlled by GSAP autoAlpha */
+.scene-sheet {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* Aspect Ratio 16:9 (1920x1080) Safe Zone */
+#root[data-width="1920"] .scene-sheet {
+  padding: 68px 88px 148px 88px;
+}
+
+/* Aspect Ratio 9:16 (1080x1920) Safe Zone */
+#root[data-width="1080"] .scene-sheet {
+  padding: 230px 64px 410px 64px;
+}
+
+/* Header & Typography Primitives */
+.scene-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.scene-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-cyan);
+  font-family: "JetBrains Mono", "PingFang SC", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.scene-headline {
+  font-size: 62px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.scene-subhead {
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+/* Central Interactive / Animated Stage */
+.scene-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Reusable Surface Cards & Badges */
+.motion-card {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 24px;
+  padding: 36px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.32);
+}
+
+.metric-hero {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 84px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent-emerald);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.status-pill.ok {
+  background: rgba(61, 220, 132, 0.14);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(61, 220, 132, 0.4);
+}
+
+.status-pill.warn {
+  background: rgba(245, 158, 11, 0.14);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.status-pill.danger {
+  background: rgba(244, 63, 94, 0.14);
+  color: var(--accent-rose);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+}
+
+/* Burned-in Synced Chinese Subtitle Rail (Aligned with Munk Ops Spec) */
+.caption-rail {
+  position: absolute;
+  left: 64px;
+  right: 64px;
+  bottom: 52px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 50;
+}
+
+#root[data-width="1080"] .caption-rail {
+  bottom: 290px;
+}
+
+.caption-box {
+  max-width: 92%;
+  padding: 16px 32px;
+  border-radius: 18px;
+  background: rgba(7, 10, 15, 0.86);
+  border: 1.5px solid rgba(56, 189, 248, 0.28);
+  color: #f8fafc;
+  font-family: "PingFang SC", "Noto Sans SC", sans-serif;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  letter-spacing: 0.02em;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}

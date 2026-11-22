@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>内容工坊 · 内容流水线看板</title>
+  <style>
+    :root {
+      --bg-canvas: #0a0c10;
+      --bg-surface: #11151e;
+      --bg-elevated: #171c28;
+      --bg-hover: #1e2536;
+      --border-subtle: #1f2737;
+      --border-strong: #2d384f;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-emerald-bg: rgba(16, 185, 129, 0.12);
+      --accent-amber-bg: rgba(245, 158, 11, 0.12);
+      --accent-rose-bg: rgba(244, 63, 94, 0.12);
+      --accent-indigo: #6366f1;
+      --accent-indigo-bg: rgba(99, 102, 241, 0.14);
+      --p1: #f59e0b;
+      --p2: #6366f1;
+      --p3: #f43f5e;
+      --radius: 10px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Inter", system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas); color: var(--text-primary); font-family: var(--font-sans);
+      font-size: 13px; line-height: 1.5; padding: 18px 20px 32px; -webkit-font-smoothing: antialiased;
+    }
+    .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px;
+    }
+    .topbar-title { display: flex; align-items: center; gap: 10px; }
+    .topbar-title h1 { font-size: 16px; font-weight: 600; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+      border-radius: 999px; font-size: 11px; font-weight: 500; border: 1px solid transparent; white-space: nowrap;
+    }
+    .badge--emerald { background: var(--accent-emerald-bg); color: #34d399; border-color: rgba(16,185,129,0.28); }
+    .badge--amber { background: var(--accent-amber-bg); color: #fbbf24; border-color: rgba(245,158,11,0.28); }
+    .badge--rose { background: var(--accent-rose-bg); color: #fb7185; border-color: rgba(244,63,94,0.28); }
+    .badge--indigo { background: var(--accent-indigo-bg); color: #818cf8; border-color: rgba(99,102,241,0.28); }
+    .quick-links { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip-btn {
+      background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 4px 9px; font-size: 11.5px; cursor: pointer; transition: all 0.15s ease;
+    }
+    .chip-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-strong); }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .kpi-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius);
+      padding: 12px 14px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .kpi-label { color: var(--text-secondary); font-size: 11.5px; display: flex; justify-content: space-between; gap: 6px; }
+    .kpi-val { font-size: 20px; font-weight: 700; }
+    .kpi-sub { color: var(--text-muted); font-size: 11px; }
+    .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px; overflow-x: auto; }
+    .tab-btn {
+      background: transparent; color: var(--text-secondary); border: none; border-bottom: 2px solid transparent;
+      padding: 8px 12px; font-size: 12.5px; font-weight: 500; cursor: pointer; white-space: nowrap;
+    }
+    .tab-btn.active { color: var(--text-primary); border-bottom-color: var(--accent-indigo); background: rgba(99,102,241,0.06); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .panel {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius);
+      padding: 14px 16px; margin-bottom: 14px;
+    }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
+    .panel-title { font-size: 13.5px; font-weight: 600; }
+
+    .kanban { display: grid; grid-template-columns: repeat(4, minmax(220px, 1fr)); gap: 12px; overflow-x: auto; }
+    @media (max-width: 960px) { .kanban { grid-template-columns: repeat(2, minmax(220px, 1fr)); } }
+    .lane { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 10px; min-height: 240px; }
+    .lane-head { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px 10px; }
+    .lane-title { font-size: 12.5px; font-weight: 600; }
+    .lane-hint { color: var(--text-muted); font-size: 11px; padding: 0 4px 8px; }
+    .card {
+      background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-left: 3px solid var(--border-strong);
+      border-radius: 8px; padding: 10px 11px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s ease;
+    }
+    .card:hover { border-color: var(--border-strong); }
+    .card[data-pillar="P1"] { border-left-color: var(--p1); }
+    .card[data-pillar="P2"] { border-left-color: var(--p2); }
+    .card[data-pillar="P3"] { border-left-color: var(--p3); }
+    .card-title { font-size: 12.5px; font-weight: 600; margin-bottom: 4px; }
+    .card-meta { color: var(--text-muted); font-size: 11px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .card-body { color: var(--text-secondary); font-size: 11.5px; margin: 4px 0 6px; }
+    .lane-empty { color: var(--text-muted); font-size: 11.5px; padding: 18px 6px; text-align: center; border: 1px dashed var(--border-subtle); border-radius: 8px; }
+
+    .pillar-row { margin-bottom: 14px; }
+    .pillar-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; flex-wrap: wrap; }
+    .bar-track { position: relative; height: 8px; background: #0d1017; border-radius: 99px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 99px; }
+    .bar-marker { position: absolute; top: -2px; bottom: -2px; width: 2px; background: #fff; opacity: 0.85; }
+
+    .timeline { position: relative; height: 34px; background: #0d1017; border-radius: 6px; overflow: hidden; margin: 8px 0 6px; display: flex; }
+    .tl-seg {
+      height: 100%; border-right: 1px solid var(--bg-canvas); display: flex; align-items: center; padding: 0 8px;
+      font-size: 11px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .scene-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; margin-top: 8px; }
+    .scene-item { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 8px 10px; font-size: 11.5px; }
+    .scene-item strong { display: block; font-size: 12px; margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- MUNK_DASHBOARD_DATA_START -->
+<script id="munk-dashboard-data">
+window.__DASHBOARD_DATA__ = {
+  "generatedAt": "2026-11-16T03:27:24.870Z",
+  "stats": {
+    "pendingPitches": 2,
+    "draftsInReview": 1,
+    "episodesCount": 1,
+    "videoMinutes": 1,
+    "publishedCount": 1,
+    "totalViews": 18400,
+    "totalLeads": 23
+  },
+  "pillarBalance": [
+    {
+      "id": "P1",
+      "name": "搞钱算账与微商业拆解",
+      "targetPct": 40,
+      "count": 2,
+      "actualPct": 40,
+      "driftPct": 0
+    },
+    {
+      "id": "P2",
+      "name": "一人公司杠杆与工作流实战",
+      "targetPct": 40,
+      "count": 2,
+      "actualPct": 40,
+      "driftPct": 0
+    },
+    {
+      "id": "P3",
+      "name": "反共识认知与一线踩坑复盘",
+      "targetPct": 20,
+      "count": 1,
+      "actualPct": 20,
+      "driftPct": 0
+    }
+  ],
+  "pitches": [
+    {
+      "id": "PITCH-20261104-01",
+      "sparkId": "SPARK-S01",
+      "pillar": "P2",
+      "title": "为什么 90% 的人用 AI 记笔记，最后都变成了数字垃圾场？",
+      "angle": "反常识冲突：存得越多越没用。真正有复利的是『外部信号 × 个人原话碰撞 → 常青卡 → 直接供弹写稿』。",
+      "hook": "我删了 3 年攒下的 4,000 条笔记，产出反而翻了 3 倍。",
+      "evidence": "brain/topics/one-person-company-leverage.md 反面教材；radar SOC-20261104-02 低粉爆款 5,800 赞",
+      "channels": [
+        "公众号深度长文",
+        "小红书图解卡",
+        "X 观点串推",
+        "60s 竖屏动画"
+      ],
+      "status": "pending",
+      "date": "2026-11-04",
+      "path": "pitches/2026-11-04.md"
+    },
+    {
+      "id": "PITCH-20261104-02",
+      "sparkId": null,
+      "pillar": "P1",
+      "title": "别再买 $99/月 的连接器了：用本地浏览器 Agent 打通所有经营后台",
+      "angle": "算账型拆解：同样是对账/巡检，SaaS 连接器年费 vs 本地已登录浏览器 + 只读 Agent 的真实成本对比。",
+      "hook": "我把一年 ¥8,500 的 SaaS 账单砍到了 0，只多花了一个下午。",
+      "evidence": "radar SIG-20261104-01（Show HN 24h 1,800 Stars）；wealth subscriptions.json 吸血鬼订阅清单",
+      "channels": [
+        "公众号深度长文",
+        "16:9 横屏讲解视频"
+      ],
+      "status": "pending",
+      "date": "2026-11-04",
+      "path": "pitches/2026-11-04.md"
+    }
+  ],
+  "drafts": [
+    {
+      "slug": "2026-11-03-local-browser-agent-vs-saas",
+      "path": "drafts/2026-11-03-local-browser-agent-vs-saas.md",
+      "title": "我把一年 ¥8,500 的 SaaS 账单砍到了 0",
+      "pillar": "P1",
+      "channels": [
+        "wechat",
+        "xiaohongshu"
+      ],
+      "status": "review",
+      "date": "2026-11-03",
+      "wordCount": 3200,
+      "metrics": null
+    }
+  ],
+  "published": [
+    {
+      "slug": "2026-10-28-ehr-hourly-rate",
+      "path": "published/2026-10-28-ehr-hourly-rate.md",
+      "title": "接单前先算这一个数：为什么我拒掉了一个 1.2 万的外包",
+      "pillar": "P3",
+      "channels": [
+        "wechat",
+        "x"
+      ],
+      "status": "published",
+      "date": "2026-10-28",
+      "wordCount": null,
+      "metrics": {
+        "views": 18400,
+        "saves": 1260,
+        "leads": 23
+      }
+    }
+  ],
+  "episodes": [
+    {
+      "slug": "notes-graveyard",
+      "month": "2026-11",
+      "path": "episodes/2026-11/notes-graveyard/scenes.json",
+      "title": "为什么你的 AI 笔记最后都变成了数字垃圾场",
+      "pillar": "P2",
+      "aspect": "9:16",
+      "theme": "dark-keynote",
+      "status": "archived",
+      "totalDuration": 58.4,
+      "sceneCount": 3,
+      "renderPath": "renders/notes-graveyard/notes-graveyard-9x16.mp4",
+      "scenes": [
+        {
+          "id": "scene-1-hook",
+          "startTime": 0,
+          "duration": 7.2,
+          "headline": "存得越多，越没用",
+          "visualMetaphor": "笔记卡片像雪花堆满屏幕，最后压塌成一座灰色坟堆"
+        },
+        {
+          "id": "scene-2-mechanism",
+          "startTime": 7.2,
+          "duration": 28.6,
+          "headline": "信号 × 原话 → 常青卡",
+          "visualMetaphor": "左侧外部信号流与右侧个人语录碰撞出火花，火花凝结成一张发光的常青卡"
+        },
+        {
+          "id": "scene-3-takeaway",
+          "startTime": 35.8,
+          "duration": 22.6,
+          "headline": "今晚就做一件事",
+          "visualMetaphor": "三张卡片依次翻面点亮，背后连线到『文章 / 视频 / 产品』三个出口"
+        }
+      ]
+    }
+  ],
+  "voice": {
+    "antiSlopRules": 10,
+    "deepEssaySamples": 2,
+    "punchySocialSamples": 3
+  }
+};
+</script>
+<!-- MUNK_DASHBOARD_DATA_END -->
+
+  <header class="topbar">
+    <div class="topbar-title">
+      <h1>✍️ 内容工坊 · 内容流水线看板</h1>
+      <span class="badge badge--indigo" id="meta-updated">校准中...</span>
+    </div>
+    <div class="quick-links">
+      <button class="chip-btn" onclick="openProjectFile('pillars.md')">🏛️ 内容支柱</button>
+      <button class="chip-btn" onclick="openProjectFile('voice/persona-and-lore.md')">🎙️ 人设与语料</button>
+      <button class="chip-btn" onclick="openProjectFile('voice/anti-slop-rewrites.md')">🚫 反 AI 腔红线</button>
+      <button class="chip-btn" onclick="openProjectFile('src/video-studio/design.md')">🎬 视频引擎设计</button>
+    </div>
+  </header>
+
+  <section class="kpi-grid" id="kpi-grid"></section>
+
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="switchTab('pipeline', this)">🗂️ 内容流水线</button>
+    <button class="tab-btn" onclick="switchTab('pillars', this)">🏛️ 支柱配比</button>
+    <button class="tab-btn" onclick="switchTab('video', this)">🎬 视频分镜时间轴</button>
+    <button class="tab-btn" onclick="switchTab('voice', this)">🎙️ 语感资产</button>
+  </nav>
+
+  <div id="tab-pipeline" class="tab-pane active">
+    <div class="panel-head" style="margin-bottom:10px;">
+      <span class="panel-title">从火花到发布：选题 → 待审稿 → 视频 → 已发布</span>
+      <div class="quick-links">
+        <button class="chip-btn" onclick="filterPillar('all')">全部支柱</button>
+        <button class="chip-btn" onclick="filterPillar('P1')">🟧 P1 搞钱算账</button>
+        <button class="chip-btn" onclick="filterPillar('P2')">🟦 P2 杠杆工作流</button>
+        <button class="chip-btn" onclick="filterPillar('P3')">🟥 P3 反共识复盘</button>
+      </div>
+    </div>
+    <div class="kanban" id="kanban"></div>
+  </div>
+
+  <div id="tab-pillars" class="tab-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">三大支柱实际配比与目标对比（目标 4 : 4 : 2）</span>
+        <button class="chip-btn" onclick="openProjectFile('pillars.md')">修改支柱定义</button>
+      </div>
+      <div id="pillar-balance"></div>
+      <p style="color:var(--text-muted);font-size:11.5px;margin-top:4px;">统计范围：所有选题提案、待审稿、视频与已发布内容。白线是目标占比。</p>
+    </div>
+  </div>
+
+  <div id="tab-video" class="tab-pane">
+    <div id="episodes-list"></div>
+  </div>
+
+  <div id="tab-voice" class="tab-pane">
+    <div class="kpi-grid" id="voice-grid"></div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">语感进化闭环</span>
+      </div>
+      <p style="color:var(--text-secondary);font-size:12px;">
+        你在 <code>drafts/</code> 里手改定稿并移入 <code>published/</code> 后，<code>voice-evolver</code> 会对比两版：你删掉的 AI 腔写进反 AI 腔红线，你满意的改写收进黄金样本。下次生成时会自动带上这些改法。
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const PILLAR_COLORS = { P1: "#f59e0b", P2: "#6366f1", P3: "#f43f5e" };
+    const PILLAR_LABEL = { P1: "P1 搞钱算账", P2: "P2 杠杆工作流", P3: "P3 反共识复盘" };
+    let currentPillar = "all";
+
+    const esc = (v) =>
+      String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    function openProjectFile(path) {
+      if (path && window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: "munk:ops-select-path", path }, "*");
+      }
+    }
+
+    function switchTab(id, btn) {
+      document.querySelectorAll(".tab-pane").forEach((el) => el.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach((el) => el.classList.remove("active"));
+      document.getElementById("tab-" + id)?.classList.add("active");
+      btn?.classList.add("active");
+    }
+
+    function pillarBadge(p) {
+      if (!p) return "";
+      const cls = p === "P1" ? "badge--amber" : p === "P2" ? "badge--indigo" : "badge--rose";
+      return `<span class="badge ${cls}">${PILLAR_LABEL[p] || p}</span>`;
+    }
+
+    function fmtDuration(sec) {
+      const s = Math.round(Number(sec || 0));
+      return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    }
+
+    function renderKpis(data) {
+      const st = data.stats || {};
+      document.getElementById("meta-updated").textContent = "校准于 " + String(data.generatedAt || "").slice(0, 10);
+      document.getElementById("kpi-grid").innerHTML = `
+        <div class="kpi-card">
+          <div class="kpi-label"><span>待你拍板的选题</span><span class="badge badge--amber">要你</span></div>
+          <div class="kpi-val num">${st.pendingPitches ?? 0}</div>
+          <div class="kpi-sub">对公司负责人说「写今天第 N 个选题」</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><span>待你审校的稿件</span><span class="badge badge--amber">要你</span></div>
+          <div class="kpi-val num">${st.draftsInReview ?? 0}</div>
+          <div class="kpi-sub">改完移入 published/ 即触发语感学习</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><span>视频剧集</span><span class="badge badge--indigo">HyperFrames</span></div>
+          <div class="kpi-val num">${st.episodesCount ?? 0} <span style="font-size:13px;font-weight:500;">期</span></div>
+          <div class="kpi-sub">累计时长 ${st.videoMinutes ?? 0} 分钟</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><span>已发布</span><span class="badge badge--emerald">复利中</span></div>
+          <div class="kpi-val num">${st.publishedCount ?? 0} <span style="font-size:13px;font-weight:500;">篇</span></div>
+          <div class="kpi-sub">阅读 ${Number(st.totalViews || 0).toLocaleString()} · 线索 ${st.totalLeads ?? 0}</div>
+        </div>
+      `;
+    }
+
+    function laneHtml(title, hint, badgeCls, cards) {
+      return `
+        <div class="lane">
+          <div class="lane-head"><span class="lane-title">${title}</span><span class="badge ${badgeCls}">${cards.length}</span></div>
+          <div class="lane-hint">${hint}</div>
+          ${cards.length ? cards.join("") : `<div class="lane-empty">暂无</div>`}
+        </div>`;
+    }
+
+    function renderKanban() {
+      const data = window.__DASHBOARD_DATA__ || {};
+      const keep = (it) => currentPillar === "all" || it.pillar === currentPillar;
+
+      const pitchCards = (data.pitches || []).filter((p) => p.status === "pending").filter(keep).map((p) => `
+        <div class="card" data-pillar="${esc(p.pillar)}" onclick="openProjectFile('${esc(p.path)}')">
+          <div class="card-title">${esc(p.title)}</div>
+          <div class="card-body">${esc(p.hook || p.angle)}</div>
+          <div class="card-meta">${pillarBadge(p.pillar)}<span>${esc(p.date)}</span>${p.sparkId ? `<span>${esc(p.sparkId)}</span>` : ""}</div>
+        </div>`);
+
+      const draftCards = (data.drafts || []).filter(keep).map((d) => `
+        <div class="card" data-pillar="${esc(d.pillar)}" onclick="openProjectFile('${esc(d.path)}')">
+          <div class="card-title">${esc(d.title)}</div>
+          <div class="card-body">${esc((d.channels || []).join(" · "))}</div>
+          <div class="card-meta">${pillarBadge(d.pillar)}<span>${esc(d.date)}</span>${d.wordCount ? `<span class="num">${d.wordCount} 字</span>` : ""}</div>
+        </div>`);
+
+      const episodeCards = (data.episodes || []).filter(keep).map((e) => `
+        <div class="card" data-pillar="${esc(e.pillar)}" onclick="openProjectFile('${esc(e.path)}')">
+          <div class="card-title">${esc(e.title)}</div>
+          <div class="card-body">${esc(e.aspect)} · ${e.sceneCount} 镜 · <span class="num">${fmtDuration(e.totalDuration)}</span></div>
+          <div class="card-meta">${pillarBadge(e.pillar)}<span>${esc(e.month)}</span>${e.renderPath ? `<span class="badge badge--emerald">已渲染</span>` : `<span class="badge badge--amber">待渲染</span>`}</div>
+        </div>`);
+
+      const publishedCards = (data.published || []).filter(keep).map((a) => `
+        <div class="card" data-pillar="${esc(a.pillar)}" onclick="openProjectFile('${esc(a.path)}')">
+          <div class="card-title">${esc(a.title)}</div>
+          <div class="card-body">${a.metrics ? `阅读 <span class="num">${Number(a.metrics.views || 0).toLocaleString()}</span> · 收藏 <span class="num">${a.metrics.saves ?? 0}</span> · 线索 <span class="num">${a.metrics.leads ?? 0}</span>` : esc((a.channels || []).join(" · "))}</div>
+          <div class="card-meta">${pillarBadge(a.pillar)}<span>${esc(a.date)}</span></div>
+        </div>`);
+
+      document.getElementById("kanban").innerHTML = [
+        laneHtml("🎯 选题提案", "pitches/ · 等你拍板", "badge--amber", pitchCards),
+        laneHtml("📝 待审稿件", "drafts/ · 等你审校", "badge--amber", draftCards),
+        laneHtml("🎬 视频剧集", "episodes/ · 源码归档", "badge--indigo", episodeCards),
+        laneHtml("✅ 已发布", "published/ · 语感已学习", "badge--emerald", publishedCards)
+      ].join("");
+    }
+
+    function filterPillar(p) {
+      currentPillar = p;
+      renderKanban();
+    }
+
+    function renderPillars(data) {
+      document.getElementById("pillar-balance").innerHTML = (data.pillarBalance || []).map((p) => {
+        const color = PILLAR_COLORS[p.id] || "#6366f1";
+        const off = Math.abs(p.driftPct) > 10;
+        return `
+          <div class="pillar-row">
+            <div class="pillar-top">
+              <span><strong>${esc(p.id)}</strong> ${esc(p.name)}</span>
+              <span class="num">${p.count} 条 · ${p.actualPct}% / 目标 ${p.targetPct}%
+                ${off ? `<span class="badge badge--rose">偏离 ${p.driftPct > 0 ? "+" : ""}${p.driftPct}%</span>` : `<span class="badge badge--emerald">平衡</span>`}
+              </span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${Math.min(100, p.actualPct)}%;background:${color};"></div>
+              <div class="bar-marker" style="left:${p.targetPct}%;"></div>
+            </div>
+          </div>`;
+      }).join("");
+    }
+
+    function renderEpisodes(data) {
+      const eps = data.episodes || [];
+      if (!eps.length) {
+        document.getElementById("episodes-list").innerHTML = `<div class="panel"><div class="lane-empty">还没有视频剧集。对公司负责人说「把这篇做成 60 秒竖屏视频」即可开工。</div></div>`;
+        return;
+      }
+      const palette = ["#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#f43f5e", "#a855f7"];
+      document.getElementById("episodes-list").innerHTML = eps.map((e) => {
+        const total = e.totalDuration || e.scenes.reduce((s, sc) => s + Number(sc.duration || 0), 0) || 1;
+        const segs = e.scenes.map((sc, i) => `
+          <div class="tl-seg" style="width:${(Number(sc.duration || 0) / total) * 100}%;background:${palette[i % palette.length]}33;border-left:2px solid ${palette[i % palette.length]};"
+               title="${esc(sc.headline)} (${fmtDuration(sc.startTime)} – ${fmtDuration(Number(sc.startTime) + Number(sc.duration))})">${esc(sc.headline)}</div>`).join("");
+        const items = e.scenes.map((sc) => `
+          <div class="scene-item">
+            <strong><span class="num" style="color:var(--text-muted);">${fmtDuration(sc.startTime)}</span> ${esc(sc.headline)}</strong>
+            <span style="color:var(--text-secondary);">🎨 ${esc(sc.visualMetaphor)}</span>
+          </div>`).join("");
+        return `
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-title">${esc(e.title)}</span>
+              <div class="quick-links">
+                ${pillarBadge(e.pillar)}
+                <span class="badge badge--indigo">${esc(e.aspect)}</span>
+                <span class="badge badge--indigo num">${fmtDuration(total)}</span>
+                <button class="chip-btn" onclick="openProjectFile('${esc(e.path)}')">scenes.json</button>
+              </div>
+            </div>
+            <div class="timeline">${segs}</div>
+            <div class="scene-list">${items}</div>
+          </div>`;
+      }).join("");
+    }
+
+    function renderVoice(data) {
+      const v = data.voice || {};
+      document.getElementById("voice-grid").innerHTML = `
+        <div class="kpi-card" style="cursor:pointer;" onclick="openProjectFile('voice/anti-slop-rewrites.md')">
+          <div class="kpi-label"><span>反 AI 腔红线</span><span class="badge badge--rose">禁用</span></div>
+          <div class="kpi-val num">${v.antiSlopRules ?? 0}</div>
+          <div class="kpi-sub">voice/anti-slop-rewrites.md</div>
+        </div>
+        <div class="kpi-card" style="cursor:pointer;" onclick="openProjectFile('voice/golden-samples/deep-essay-samples.md')">
+          <div class="kpi-label"><span>长文黄金样本</span><span class="badge badge--emerald">模仿</span></div>
+          <div class="kpi-val num">${v.deepEssaySamples ?? 0}</div>
+          <div class="kpi-sub">golden-samples/deep-essay-samples.md</div>
+        </div>
+        <div class="kpi-card" style="cursor:pointer;" onclick="openProjectFile('voice/golden-samples/punchy-social-samples.md')">
+          <div class="kpi-label"><span>短帖黄金样本</span><span class="badge badge--emerald">模仿</span></div>
+          <div class="kpi-val num">${v.punchySocialSamples ?? 0}</div>
+          <div class="kpi-sub">golden-samples/punchy-social-samples.md</div>
+        </div>
+      `;
+    }
+
+    const data = window.__DASHBOARD_DATA__ || {};
+    renderKpis(data);
+    renderKanban();
+    renderPillars(data);
+    renderEpisodes(data);
+    renderVoice(data);
+  </script>
+</body>
+</html>
