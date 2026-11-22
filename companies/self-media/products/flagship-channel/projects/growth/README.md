@@ -2,6 +2,6 @@
 
 这个项目负责用真实数据回答一个问题：这个频道这个周期到底有没有跑出方向？
 
-- `tasks/weekly-channel-retro.md`：每周日 19:00 汇总本周内容产出、平台侧真实互动与可得转化信号，产出复盘结论，供矩阵总控的周度赛马比较使用。
+- `tasks/weekly-channel-retro.md`：每周日 19:00 汇总本周内容产出、平台侧真实互动与可得转化信号，产出复盘结论，供矩阵总控的周度赛马比较使用。复盘读取同级 `studio` 的 `pitches/`、`drafts/`、`published/` 与同级 `radar` 的 `signals/`，均通过 frontmatter `reads.projects` 显式声明只读授权。
 
 没有平台后台数据时，如实写「暂无数据」并说明缺什么，不用估算数字填满复盘。

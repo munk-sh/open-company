@@ -2,10 +2,13 @@
 /**
  * Radar Sentinel (Zero-Token Preflight Guard for `public-signal-scan`)
  *
- * 读取 `../watchlist.json` 中的 `public_sources`，拉取公开免鉴权接口与 RSS/Atom，
- * 对照 `../.state/seen-items.json` 去重并按关键词加权过滤：
- * - 有新信号：写入 `../.state/pending-signals.json` 并 exit 0（唤醒 Agent 深挖与评级）
- * - 无新信号：直接 exit 1（0 Token 静默跳过）
+ * 读取本项目的 `watchlist.json` 中的 `public_sources`，拉取公开免鉴权接口与 RSS/Atom，
+ * 对照本项目的 `.state/seen-items.json` 去重并按关键词加权过滤。
+ *
+ * 退出码协议（严格遵循 0 唤醒 / 1 跳过 / 2 报错）：
+ * - 0：至少一个外部源成功返回且发现新信号，已写入 `.state/pending-signals.json`（唤醒 Agent 深挖与评级）
+ * - 1：至少一个外部源成功返回，但无新信号（0 Token 静默跳过）
+ * - 2：配置缺失/损坏、未捕获异常，或全部外部源抓取失败（向 stderr 输出明确原因，绝不伪装成 1）
  */
 
 import fs from "node:fs/promises";
@@ -23,6 +26,15 @@ const PENDING_PATH = path.join(STATE_DIR, "pending-signals.json");
 const FETCH_TIMEOUT_MS = 10_000;
 const MAX_SEEN_IDS = 1500;
 
+const EXIT_TRIGGER = 0;
+const EXIT_SKIP = 1;
+const EXIT_ERROR = 2;
+
+function fail(message) {
+  process.stderr.write(`[radar-sentinel] ${message}\n`);
+  process.exit(EXIT_ERROR);
+}
+
 async function readJsonSafe(filePath, fallback) {
   try {
     const raw = await fs.readFile(filePath, "utf8");
@@ -30,6 +42,27 @@ async function readJsonSafe(filePath, fallback) {
   } catch {
     return fallback;
   }
+}
+
+async function loadWatchlist() {
+  let raw;
+  try {
+    raw = await fs.readFile(WATCHLIST_PATH, "utf8");
+  } catch (error) {
+    fail(`无法读取 watchlist.json（${WATCHLIST_PATH}）：${error.message}`);
+  }
+
+  let watchlist;
+  try {
+    watchlist = JSON.parse(raw);
+  } catch (error) {
+    fail(`watchlist.json 不是合法 JSON：${error.message}`);
+  }
+
+  if (!watchlist || typeof watchlist !== "object" || Array.isArray(watchlist)) {
+    fail("watchlist.json 结构损坏：根节点必须是对象");
+  }
+  return watchlist;
 }
 
 async function fetchText(url) {
@@ -133,20 +166,23 @@ function evaluateKeywords(item, keywords) {
 
 async function main() {
   if (process.env.RADAR_FORCE_TRIGGER === "1") {
-    process.exit(0);
+    process.exit(EXIT_TRIGGER);
   }
 
-  const watchlist = await readJsonSafe(WATCHLIST_PATH, null);
-  if (!watchlist) {
-    process.exit(1);
-  }
+  const watchlist = await loadWatchlist();
 
   await fs.mkdir(STATE_DIR, { recursive: true });
   const seenState = await readJsonSafe(SEEN_PATH, { ids: [] });
   const seenSet = new Set(Array.isArray(seenState.ids) ? seenState.ids : []);
 
   const enabledSources = (watchlist.public_sources || []).filter((s) => s.enabled !== false);
+  if (enabledSources.length === 0) {
+    fail("watchlist.json 未声明任何启用的 public_sources");
+  }
+
   const candidates = [];
+  const sourceErrors = [];
+  let succeededSources = 0;
 
   for (const source of enabledSources) {
     try {
@@ -155,7 +191,10 @@ async function main() {
         fetched = await fetchHnList(source.type, source.min_score ?? 80, source.limit ?? 15);
       } else if (source.type === "rss" && source.url) {
         fetched = await fetchRssSource(source);
+      } else {
+        throw new Error(`不支持的源类型：${source.type ?? "(缺失)"}`);
       }
+      succeededSources += 1;
 
       for (const item of fetched) {
         if (seenSet.has(item.uid)) continue;
@@ -171,13 +210,27 @@ async function main() {
           priorityScore: (matchedBoost.length * 50) + (item.score ? Math.min(item.score, 300) : 30)
         });
       }
-    } catch {
-      // 单个源网络抖动不阻断其余源巡检
+    } catch (error) {
+      // 单个源失败只记录原因，不阻断其余源巡检；全部失败才升级为错误退出
+      sourceErrors.push(`${source.id ?? "(未命名)"}: ${error?.message ?? error}`);
     }
   }
 
+  if (succeededSources === 0) {
+    fail(
+      `全部 ${enabledSources.length} 个外部源抓取失败：\n${sourceErrors.map((line) => `  - ${line}`).join("\n")}`
+    );
+  }
+  if (sourceErrors.length > 0) {
+    process.stderr.write(
+      `[radar-sentinel] 警告：${sourceErrors.length}/${enabledSources.length} 个源抓取失败，继续使用其余源结果：\n${sourceErrors
+        .map((line) => `  - ${line}`)
+        .join("\n")}\n`
+    );
+  }
+
   if (candidates.length === 0) {
-    process.exit(1);
+    process.exit(EXIT_SKIP);
   }
 
   candidates.sort((a, b) => b.priorityScore - a.priorityScore);
@@ -209,9 +262,10 @@ async function main() {
     "utf8"
   );
 
-  process.exit(0);
+  process.exit(EXIT_TRIGGER);
 }
 
-main().catch(() => {
-  process.exit(1);
+main().catch((error) => {
+  process.stderr.write(`[radar-sentinel] 未捕获异常：${error?.stack ?? error}\n`);
+  process.exit(EXIT_ERROR);
 });

@@ -7,7 +7,7 @@
 1. **确认垂直赛道**：你打算服务哪一类人、解决他们的什么问题？（例如：AI 工具实战、职场效率、小生意经营、家居收纳等。）赛道越窄，前 14 天的信号越容易判断。
 2. **确认目标平台**：从小红书、X、公众号中选出首轮主攻的 1–2 个平台。平台不同，内容形态与转化口径也不同。
 3. **确认样板频道定位**：人设是谁、跟读者是什么关系、绝不扮演什么角色；一句话说明「读者为什么要关注你」。
-4. **初始化样板频道**：把以上结论写进 `products/flagship-channel/goal.md` 与 `AGENTS.md`，清空 `products/flagship-channel/code/` 下任何占位内容，让内容库保持真实的空态。
+4. **初始化样板频道**：把以上结论写进 `products/flagship-channel/goal.md` 与 `AGENTS.md`，清空 `products/flagship-channel/projects/studio/` 下 `pitches/`、`drafts/`、`published/` 的任何占位内容，让内容库保持真实的空态。
 5. **触发首轮真实热点抓取**：运行一次 `products/flagship-channel/projects/radar/tasks/public-signal-scan.md`，由公开信源哨兵拉取真实信号，产生频道的第一批选题原料。
 
 ## 对话引导顺序

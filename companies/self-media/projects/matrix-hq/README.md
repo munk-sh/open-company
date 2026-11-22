@@ -10,7 +10,7 @@
 
 - `flagship-channel`：首发样板频道，从 Day-0 空态开始，等待第一轮真实信号与复盘。
 
-新增频道后，在 `tasks/weekly-matrix-review.md` 的 `reads.projects` 中登记它的 `growth` 项目，下一轮周会即进入比较。
+新增频道后，在 `tasks/weekly-matrix-review.md` 的 `reads.projects` 中登记它的 `radar`、`studio` 与 `growth` 项目，下一轮周会即进入比较。跨项目读取靠这份声明获得只读授权，不要用相对路径越权访问。
 
 ## 看板
 
